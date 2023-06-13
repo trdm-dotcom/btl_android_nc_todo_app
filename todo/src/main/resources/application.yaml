@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: todo
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+      hibernate.id.new_generator_mappings: true
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: "jdbc:mysql://localhost:3306/android-nc"
+    username: root
+    password: admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      read_unknown_enum_values_as_null: true
+  redis:
+    host: localhost
+    port: 6379
+    password:
+
+logging:
+  file: /logs/application.log
+  level:
+    root: WARN
+    org.springframework: WARN
+    com.example: INFO
+    in: WARN
+    out: WARN
+app:
+  privateKey: "/external/rsa-private.key"
+  privateJwtKey: "/external/jwt-private.key"
+  accessTokenExpirationInMs: 604800000 # 7 days
+  refreshTokenExpirationInMs: 900000 # 15 minutes
+  clientSecretLogin: "8VT9s8b0vX"
+  encryptPassword: false
+  loginTemporarilyLocked: 5 #times
+  loginTemporarilyLockedTime: 1800000 #30 minutes
+server:
+  port: 8083
