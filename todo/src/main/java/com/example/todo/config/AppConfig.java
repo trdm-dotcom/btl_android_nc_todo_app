@@ -14,4 +14,20 @@ public class AppConfig {
     private Boolean encryptPassword;
     private Integer loginTemporarilyLocked;
     private Integer loginTemporarilyLockedTime;
+    private Template template;
+    private Mail mail;
+
+    @Data
+    public static class Template {
+        private String dir;
+    }
+
+    @Data
+    public static class Mail {
+        private String sender;
+        private String smtpUsername;
+        private String smtpPassword;
+        private String endpoint;
+        private int port;
+    }
 }

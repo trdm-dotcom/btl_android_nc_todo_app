@@ -1,5 +1,6 @@
 package com.example.todo.servies;
 
+import com.example.todo.common.exception.GeneralException;
 import com.example.todo.config.AppConfig;
 import com.example.todo.constants.Constants;
 import com.example.todo.models.db.RefreshToken;
@@ -42,9 +43,9 @@ public class TokenService {
 
     public RefreshTokenResponse refreshToken(String token) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         Date now = new Date();
-        RefreshToken refreshToken = this.refreshTokenRepository.findByToken(token).orElseThrow(() -> new RuntimeException(Constants.INVALID_REFRESH_TOKEN));
+        RefreshToken refreshToken = this.refreshTokenRepository.findByToken(token).orElseThrow(() -> new GeneralException(Constants.INVALID_REFRESH_TOKEN));
         if(refreshToken.getExpiredAt().before(now)) {
-            throw new RuntimeException(Constants.REFRESH_TOKEN_EXPIRED);
+            throw new GeneralException(Constants.REFRESH_TOKEN_EXPIRED);
         }
         CustomUserDetails customUserDetails = new CustomUserDetails(refreshToken.getUser());
         String accessToken = this.jwtUtilities.generateToken(customUserDetails, refreshToken.getToken());

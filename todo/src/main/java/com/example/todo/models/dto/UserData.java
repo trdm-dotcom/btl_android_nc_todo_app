@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class UserData {
     private Long id;
     private String name;
-    private String username;
+    private String email;
     private UserStatus status;
 }

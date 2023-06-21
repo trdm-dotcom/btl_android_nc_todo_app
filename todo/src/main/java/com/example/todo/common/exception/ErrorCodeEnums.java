@@ -1,0 +1,15 @@
+package com.example.todo.common.exception;
+
+public enum ErrorCodeEnums {
+    INTERNAL_SERVER_ERROR,
+    INVALID_PARAMETER,
+    INVALID_FORMAT,
+    INVALID_VALUE,
+    VALUE_MUST_GREATER_OR_EQUAL,
+    VALUE_MUST_GREATER,
+    VALUE_MUST_LESS_OR_EQUAL,
+    VALUE_MUST_LESS,
+    VALUE_MUST_EQUAL,
+    VALUE_MUST_IN,
+    EMPTY_VALUE
+}

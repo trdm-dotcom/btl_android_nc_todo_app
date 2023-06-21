@@ -1,5 +1,6 @@
 package com.example.todo.models.db;
 
+import com.example.todo.constants.enums.UserRole;
 import com.example.todo.constants.enums.UserStatus;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,19 +19,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
     @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String password;
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-    @OneToMany(mappedBy = "user")
-    private Set<Task> tasks;
-    @OneToMany(mappedBy = "user")
-    private Set<RefreshToken> refreshTokens;
-    @OneToMany(mappedBy = "user")
-    private Set<Category> categories;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_organizations",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "organization_id"))
+    private Set<Organization> organizations = new HashSet<>();
     @UpdateTimestamp
     private Date updatedAt;
     @CreationTimestamp

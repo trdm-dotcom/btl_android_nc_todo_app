@@ -1,6 +1,6 @@
 package com.example.todo.security;
 
-import com.example.todo.models.dto.DataRequest;
+import com.example.todo.models.request.DataRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,8 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 
 @Slf4j
 @Component
@@ -33,23 +31,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = this.parseJwt(request);
             if (token != null && this.jwtUtilities.validateToken(token)) {
-                DataRequest dataRequest = null;
-                try {
-                    dataRequest = this.jwtUtilities.getDataRequest(token);
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                    throw new RuntimeException(e);
-                }
-                UserDetails userDetails = customerUserDetailsService.loadUserByUsername(dataRequest.getUd().getUsername());
+                DataRequest dataRequest = this.jwtUtilities.getDataRequest(token);
+                log.info("dataRequest: {}", dataRequest);
+                request.setAttribute("dataRequest", dataRequest);
+                UserDetails userDetails = customerUserDetailsService.loadUserByUsername(dataRequest.getUserData().getEmail());
                 if (userDetails != null) {
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
-                    log.info("authenticated user with username:{}", dataRequest.getUd().getUsername());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error("Cannot set user authentication: ", e);
         }
         filterChain.doFilter(request, response);
@@ -59,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String headerAuth = request.getHeader("Authorization");
 
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("jwt ")) {
-            return headerAuth.substring(7);
+            return headerAuth.substring(4);
         }
 
         return null;

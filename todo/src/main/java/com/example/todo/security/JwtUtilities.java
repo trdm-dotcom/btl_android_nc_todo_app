@@ -1,8 +1,9 @@
 package com.example.todo.security;
 
 import com.example.todo.config.AppConfig;
-import com.example.todo.models.dto.DataRequest;
+import com.example.todo.models.dto.ExtraData;
 import com.example.todo.models.dto.UserData;
+import com.example.todo.models.request.DataRequest;
 import com.example.todo.utils.Util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -30,15 +32,13 @@ public class JwtUtilities {
     public String generateToken(CustomUserDetails userDetails, String rfId) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + this.appConfig.getAccessTokenExpirationInMs());
-        UserData userData = new UserData(userDetails.getUser().getId(), userDetails.getUser().getName(),
-                userDetails.getUser().getUsername(), userDetails.getUser().getStatus());
-        DataRequest dataRequest = new DataRequest();
-        dataRequest.setUd(userData);
-        dataRequest.setRId(rfId);
+        UserData userData = new UserData(userDetails.getUser().getId(), userDetails.getUser().getName(), userDetails.getUser().getEmail(), userDetails.getUser().getStatus());
+        ExtraData extraData = new ExtraData(rfId, userData);
 
         return Jwts.builder()
                 .setHeaderParam("kid", UUID.randomUUID().toString())
-                .setClaims(this.objectMapper.convertValue(dataRequest, new TypeReference<Map<String, Object>>() {}))
+                .setClaims(this.objectMapper.convertValue(extraData, new TypeReference<Map<String, Object>>() {
+                }))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.RS256, Util.getPrivateKey(this.appConfig.getPrivateJwtKey()))
@@ -51,7 +51,11 @@ public class JwtUtilities {
 
     public DataRequest getDataRequest(String token) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         Claims claims = extractAllClaims(token);
-        return this.objectMapper.readValue(claims.get("payload").toString(), DataRequest.class);
+        log.info("claims: {}", claims);
+        DataRequest dataRequest = new DataRequest();
+        dataRequest.setRid(claims.get("rId", String.class));
+        dataRequest.setUserData(this.objectMapper.convertValue(claims.get("ud", LinkedHashMap.class), UserData.class));
+        return dataRequest;
     }
 
     public Date extractExpiration(String token) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
@@ -64,12 +68,17 @@ public class JwtUtilities {
     }
 
     public Claims extractAllClaims(String token) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        return Jwts.parser().setSigningKey(Util.getPrivateKey(this.appConfig.getPrivateJwtKey())).parseClaimsJws(token).getBody();
+        return Jwts.parser()
+                .setSigningKey(Util.getPrivateKey(this.appConfig.getPrivateJwtKey()))
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(Util.getPrivateKey(this.appConfig.getPrivateJwtKey())).parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(Util.getPrivateKey(this.appConfig.getPrivateJwtKey()))
+                    .parseClaimsJws(token);
             return true;
         } catch (SignatureException e) {
             log.info("Invalid JWT signature.");

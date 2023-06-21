@@ -1,5 +1,6 @@
 package com.example.todo.dao;
 
+import com.example.todo.common.exception.GeneralException;
 import com.example.todo.constants.Constants;
 import com.example.todo.models.dto.LoginValidate;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +34,7 @@ public class RedisDao {
         if (loginValidate != null) {
             return this.objectMapper.readValue(loginValidate, LoginValidate.class);
         } else {
-            throw new RuntimeException(Constants.OBJECT_NOT_FOUND);
+            throw new GeneralException(Constants.OBJECT_NOT_FOUND);
         }
     }
 }

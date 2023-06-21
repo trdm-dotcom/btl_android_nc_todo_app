@@ -1,14 +1,27 @@
 package com.example.todo.controllers;
 
+import com.example.todo.common.exception.GeneralException;
+import com.example.todo.constants.enums.Priority;
+import com.example.todo.constants.enums.TaskStatus;
+import com.example.todo.models.dto.TaskDto;
+import com.example.todo.models.request.AssigneeRequest;
+import com.example.todo.models.request.CommentRequest;
+import com.example.todo.models.request.DataRequest;
 import com.example.todo.models.request.TaskRequest;
+import com.example.todo.models.response.Status;
 import com.example.todo.servies.TaskService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Set;
+
+import static com.example.todo.common.exception.ErrorCodeEnums.INTERNAL_SERVER_ERROR;
 
 @Slf4j
 @RestController
@@ -16,14 +29,121 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
     @Autowired
     private TaskService taskService;
-    @PostMapping()
-    public ResponseEntity<Object> addTask(@RequestBody TaskRequest request) {
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @PostMapping
+    public ResponseEntity<Object> addTask(HttpServletRequest request, @RequestBody TaskRequest taskRequest) {
         try {
-            this.taskService.addTask(request);
-            return ResponseEntity.ok().build();
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.taskService.addTask(dataRequest, taskRequest));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
         }
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @PutMapping("/{task}")
+    public ResponseEntity<Object> updateTask(HttpServletRequest request, @RequestBody TaskRequest taskRequest, @PathVariable("task") Long task) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.taskService.updateTask(dataRequest, task, taskRequest));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
+        }
+    }
+
+    @DeleteMapping("/{task}")
+    public ResponseEntity<Object> deleteTask(HttpServletRequest request, @PathVariable("task") Long task) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.taskService.deleteTask(dataRequest, task));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<Set<TaskDto>> getTasks(HttpServletRequest request,
+                                                 @RequestParam Integer pageSize,
+                                                 @RequestParam Integer pageNumber,
+                                                 @RequestParam LocalDate date,
+                                                 @RequestParam Priority priority,
+                                                 @RequestParam TaskStatus taskStatus) {
+        DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+        return ResponseEntity.ok(this.taskService.findTaskBy(dataRequest, pageSize, pageNumber, date, priority, taskStatus));
+    }
+
+    @GetMapping("/{task}")
+    public ResponseEntity<Object> getTask(@PathVariable("task") Long task) {
+        try {
+            return ResponseEntity.ok(this.taskService.findTaskById(task));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
+        }
+    }
+
+    @PutMapping("/{task}/status/{status}")
+    public ResponseEntity<Object> completeTask(HttpServletRequest request, @PathVariable("task") Long task, @PathVariable("status") TaskStatus status) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.taskService.updateTaskStatus(dataRequest, task, status));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
+        }
+    }
+
+    @PutMapping("/assignee")
+    public ResponseEntity<Object> assigneeTask(HttpServletRequest request, @RequestBody AssigneeRequest assigneeRequest) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.taskService.assigneeTask(dataRequest, assigneeRequest));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
+        }
+    }
+
+    @PostMapping("/comment")
+    public ResponseEntity<Object> addComment(HttpServletRequest request, @RequestBody CommentRequest commentRequest) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.taskService.addComment(dataRequest, commentRequest));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
         }
     }
 }

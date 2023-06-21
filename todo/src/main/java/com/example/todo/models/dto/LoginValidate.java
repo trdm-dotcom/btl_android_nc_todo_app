@@ -12,6 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LoginValidate {
     private String username;
-    private Integer failCount;
+    private Integer failCount = 0;
     private LocalDateTime latestRequest;
 }

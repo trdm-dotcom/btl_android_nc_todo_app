@@ -7,7 +7,7 @@ spring:
       hibernate.jdbc.time_zone: UTC
       hibernate.id.new_generator_mappings: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
   datasource:
     url: "jdbc:mysql://localhost:3306/android-nc"
     username: root
@@ -31,13 +31,23 @@ logging:
     in: WARN
     out: WARN
 app:
-  privateKey: "/external/rsa-private.key"
-  privateJwtKey: "/external/jwt-private.key"
+  template:
+    dir: src/main/resources/templates/
+  privateKey: /external/rsa-private.key
+  privateJwtKey: /external/jwt-private.key
   accessTokenExpirationInMs: 604800000 # 7 days
   refreshTokenExpirationInMs: 900000 # 15 minutes
   clientSecretLogin: "8VT9s8b0vX"
   encryptPassword: false
   loginTemporarilyLocked: 5 #times
   loginTemporarilyLockedTime: 1800000 #30 minutes
+  mail:
+    sender: houddnc.st46@gmail.com
+    smtpUsername: houddnc.st46@gmail.com
+    smtpPassword: oufxadsxfqzgvyzx
+    port: 587
+    endpoint: smtp.gmail.com
+  schedulers:
+    sendMail: 0 0 8 * * MON-SAT # at 08:00:00 monday to saturday
 server:
   port: 8083
