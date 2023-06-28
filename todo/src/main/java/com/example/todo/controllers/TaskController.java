@@ -81,7 +81,7 @@ public class TaskController {
     public ResponseEntity<Set<TaskDto>> getTasks(HttpServletRequest request,
                                                  @RequestParam Integer pageSize,
                                                  @RequestParam Integer pageNumber,
-                                                 @RequestParam LocalDate date,
+                                                 @RequestParam String date,
                                                  @RequestParam Priority priority,
                                                  @RequestParam TaskStatus taskStatus) {
         DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);

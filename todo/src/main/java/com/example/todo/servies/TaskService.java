@@ -122,7 +122,7 @@ public class TaskService {
         return new HashMap<>();
     }
 
-    public Set<TaskDto> findTaskBy(DataRequest dataRequest, Integer pageSize, Integer pageNumber, LocalDate date, Priority priority, TaskStatus status) {
+    public Set<TaskDto> findTaskBy(DataRequest dataRequest, Integer pageSize, Integer pageNumber, String date, Priority priority, TaskStatus status) {
         Integer fetchCount = pageSize == null ? Constants.DEFAULT_FETCH_COUNT : Math.min(pageSize, Constants.MAX_FETCH_COUNT);
         Integer offset = pageNumber == null ? Constants.DEFAULT_OFFSET : Math.max(0, pageNumber);
         Pageable pageable = PageRequest.of(offset, fetchCount);

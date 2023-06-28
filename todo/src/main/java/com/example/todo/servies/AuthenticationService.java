@@ -55,7 +55,7 @@ public class AuthenticationService {
         }
         User user = this.findAndValidateUser(request, now);
         String password = this.appConfig.getEncryptPassword() ? Util.enCryptRSA(appConfig.getPrivateKey(), request.getPassword()) : request.getPassword();
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!passwordEncoder.matches(password.trim(), user.getPassword())) {
             throw new GeneralException(Constants.INVALID_CLIENT_CREDENTIAL);
         }
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
@@ -111,7 +111,7 @@ public class AuthenticationService {
         }
         User user = new User();
         user.setStatus(UserStatus.ACTIVE);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(passwordEncoder.encode(password.trim()));
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         this.userRepository.saveAndFlush(user);
