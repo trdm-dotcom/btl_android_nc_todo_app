@@ -2,8 +2,29 @@
     <string name="app_name">todo</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="enter_your_email">Enter Your Email .....</string>
+    <string name="enter_your_mail">Enter Your Mail .....</string>
+    <string name="enter_your_name">Enter Your Name .....</string>
     <string name="enter_your_pass">Enter Your Password .....</string>
     <string name="re_enter_your_pass">Re-enter Your Password .....</string>
     <string name="type_your_task">Type your task .....</string>
+    <string name="task_title">Task Title</string>
+    <string name="task_description">Task Description</string>
+    <string name="task_priority">Priority</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="name">Name</string>
+    <string name="completed">Completed</string>
+    <string name="delete">Delete</string>
+    <string name="close">Close</string>
+    <string-array name="priority_dropdown_items">
+        <item>LOW</item>
+        <item>MEDIUM</item>
+        <item>HIGH</item>
+    </string-array>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete_confirmation">Confirmation</string>
+    <string name="sureToDelete">Are you sure you want to delete the task</string>
+    <string name="confirmation">Completed the task!..</string>
+    <string name="sureToMarkAsComplete">Are you sure you want to mark this task as completed.</string>
+    <string name="congrats_you_have_completed_the_task_successfully">Congrats!... You have completed the task successfully..</string>
 </resources>

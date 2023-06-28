@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corner"
+    android:clipToPadding="false"
+    android:elevation="17sp"
+    android:orientation="vertical"
+    android:paddingHorizontal="20sp"
+    android:paddingTop="30sp"
+    android:paddingBottom="50sp"
+    tools:context=".fragments.TaskFormFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+        android:paddingBottom="11sp"
+        android:text="Organization form"
+        android:textColor="@color/black"
+        android:textSize="29sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="11sp"
+        android:hint="@string/name"
+        app:startIconDrawable="@drawable/pen">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/orgNameEdt"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="text"
+            android:paddingStart="12sp"
+            android:paddingTop="15sp"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageView
+        android:id="@+id/nextBtn"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_gravity="right"
+        android:layout_marginTop="16sp"
+        android:src="@drawable/btn" />
+</LinearLayout>

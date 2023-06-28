@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
-        android:layout_height="200dp"
+        android:layout_height="200sp"
         android:scaleType="fitXY"
         android:src="@drawable/design_one"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,8 +19,8 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="60dp"
-        android:layout_height="130dp"
+        android:layout_width="60sp"
+        android:layout_height="130sp"
         android:rotation="180"
         android:scaleType="fitXY"
         android:src="@drawable/ellipse_one"
@@ -30,9 +30,9 @@
 
     <ImageView
         android:id="@+id/imageView3"
-        android:layout_width="0dp"
-        android:layout_height="210dp"
-        android:layout_marginStart="12dp"
+        android:layout_width="0sp"
+        android:layout_height="210sp"
+        android:layout_marginStart="12sp"
         android:scaleType="fitXY"
         android:src="@drawable/design_two"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -45,23 +45,22 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="24sp"
+        android:layout_marginEnd="24sp"
         android:fontFamily="@font/inter_extra_bold"
         android:text="Sign Up"
         android:textColor="@color/white"
-        android:textSize="29dp"
+        android:textSize="29sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView1"
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="42dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
+        android:layout_marginHorizontal="16sp"
+        app:cardCornerRadius="8sp"
+        app:cardElevation="8sp"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -70,33 +69,34 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@color/white"
-            app:boxStrokeWidth="0dp"
-            app:boxStrokeWidthFocused="0dp"
-            app:hintEnabled="false">
+            app:boxStrokeWidth="0sp"
+            app:boxStrokeWidthFocused="0sp"
+            android:hint="@string/enter_your_mail">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/emailEt"
+                android:id="@+id/mailEdt"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="match_parent"
                 android:background="@color/white"
-                android:hint="@string/enter_your_email"
-                android:inputType="textEmailAddress"
-                android:paddingStart="12dp"
-                android:paddingTop="15dp" />
+                android:inputType="textPhonetic"
+                android:paddingStart="12sp"
+                android:paddingTop="15sp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
         </com.google.android.material.textfield.TextInputLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView2"
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="5dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="5sp"
+        app:cardCornerRadius="8sp"
+        app:cardElevation="8sp"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -104,40 +104,36 @@
         app:layout_constraintTop_toBottomOf="@id/cardView1">
 
 
-
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@color/white"
-            app:boxStrokeWidth="0dp"
-            app:boxStrokeWidthFocused="0dp"
-            app:hintEnabled="false"
-            app:passwordToggleEnabled="true">
+            app:boxStrokeWidth="0sp"
+            app:boxStrokeWidthFocused="0sp"
+            android:hint="@string/enter_your_name">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passEt"
+                android:id="@+id/nameEdt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white"
-                android:hint="@string/enter_your_pass"
-                android:inputType="textPassword"
-                android:paddingStart="12dp"
-                android:paddingTop="15dp" />
+                android:inputType="textPersonName"
+                android:paddingStart="12sp"
+                android:paddingTop="15sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
 
     </com.google.android.material.card.MaterialCardView>
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView3"
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="5dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="5sp"
+        app:cardCornerRadius="8sp"
+        app:cardElevation="8sp"
         app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -147,22 +143,59 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="@color/white"
-            app:boxStrokeWidth="0dp"
-            app:boxStrokeWidthFocused="0dp"
-            app:hintEnabled="false"
-            app:passwordToggleEnabled="true">
+            app:boxStrokeWidth="0sp"
+            app:boxStrokeWidthFocused="0sp"
+            app:passwordToggleEnabled="true"
+            android:hint="@string/enter_your_pass">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/verifyPassEt"
+                android:id="@+id/passEdt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white"
-                android:hint="@string/re_enter_your_pass"
                 android:inputType="textPassword"
-                android:paddingStart="12dp"
-                android:paddingTop="15dp" />
+                android:paddingStart="12sp"
+                android:paddingTop="15sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardView4"
+        android:layout_width="0sp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16sp"
+        android:layout_marginTop="5sp"
+        app:cardCornerRadius="8sp"
+        app:cardElevation="8sp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardView3">
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:boxStrokeWidth="0sp"
+            app:boxStrokeWidthFocused="0sp"
+            app:passwordToggleEnabled="true"
+            android:hint="@string/re_enter_your_pass">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/verifyPassEdt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:inputType="textPassword"
+                android:paddingStart="12sp"
+                android:paddingTop="15sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -171,19 +204,19 @@
 
     <ImageView
         android:id="@+id/nextBtn"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="12dp"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_marginTop="16sp"
+        android:layout_marginEnd="12sp"
         android:src="@drawable/btn"
-        app:layout_constraintEnd_toEndOf="@id/cardView3"
-        app:layout_constraintTop_toBottomOf="@id/cardView3" />
+        app:layout_constraintEnd_toEndOf="@id/cardView4"
+        app:layout_constraintTop_toBottomOf="@id/cardView4" />
 
     <TextView
         android:id="@+id/textview32"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="12sp"
         android:fontFamily="@font/inter_regular"
         android:text="Already Registered !!"
         android:textSize="16sp"
@@ -198,7 +231,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/inter_regular"
-        android:text=" Sign In"
+        android:text="Sign In"
         android:textColor="@color/text_color"
         android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"

@@ -1,3 +1,5 @@
+### client ###
+
 *.iml
 .idea
 .gradle
@@ -14,6 +16,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+### Server ###
 
 HELP.md
 target/

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_corner"
+    android:clipToPadding="false"
+    android:elevation="17sp"
+    android:orientation="vertical"
+    android:paddingHorizontal="20sp"
+    android:paddingTop="30sp"
+    android:paddingBottom="50sp"
+    tools:context=".fragments.TaskFormFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+        android:paddingBottom="11sp"
+        android:text="Task form"
+        android:textColor="@color/black"
+        android:textSize="29sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="11sp"
+        android:hint="@string/task_title"
+        app:startIconDrawable="@drawable/pen">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/taskTitleEdt"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="text"
+            android:paddingStart="12sp"
+            android:paddingTop="15sp"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="11sp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="7sp"
+            android:layout_weight="0.5"
+            app:startIconDrawable="@drawable/calendar">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/taskStartDateEdt"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:clickable="true"
+                android:hint="Start date"
+                android:inputType="none"
+                android:paddingStart="12sp"
+                android:paddingTop="15sp"
+                android:textColor="@color/black" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7sp"
+            android:layout_weight="0.5"
+            app:startIconDrawable="@drawable/calendar">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/taskEndDateEdt"
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:clickable="true"
+                android:hint="End date"
+                android:inputType="none"
+                android:paddingStart="12sp"
+                android:paddingTop="15sp"
+                android:textColor="@color/black" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="11sp">
+
+        <AutoCompleteTextView
+            android:id="@+id/priorityDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:hint="@string/task_priority"
+            android:inputType="none"
+            android:paddingStart="12sp"
+            android:paddingTop="15sp"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="11sp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/taskDesEdt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:hint="@string/task_description"
+            android:inputType="textMultiLine"
+            android:lines="6"
+            android:overScrollMode="always"
+            android:paddingStart="12sp"
+            android:paddingTop="15sp"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical"
+            android:scrollHorizontally="true"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="11sp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/taskReminderSw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textOff="Off"
+            android:textOn="On"
+            android:thumb="@drawable/thumb"
+            app:showText="true"
+            app:track="@drawable/track" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="right"
+            android:text="Set reminder for this task?"
+            android:textColor="@color/black"
+            android:textSize="17sp"></TextView>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/nextBtn"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:layout_gravity="right"
+        android:layout_marginTop="16sp"
+        android:src="@drawable/btn" />
+</LinearLayout>
