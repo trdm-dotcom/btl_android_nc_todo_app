@@ -36,12 +36,12 @@ class TodoApplicationTests {
 	JwtUtilities jwtUtilities;
 	@Autowired
 	TaskService taskService;
-	static final String rf = "155dd3d5-ebcb-4562-b8c1-6092bf315721";
+	static final String rf = "7ca43651-25d2-4aba-8699-4c633e754906";
 
 	@Test
 	public void testRegister() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
 		RegisterRequest request = new RegisterRequest();
-		request.setEmail("test1@gmail.com");
+		request.setEmail("tranfminh@gamil.com");
 		request.setName("huy");
 		request.setPassword("P@ssW0$d");
 		authenticationService.register(request);
@@ -50,8 +50,8 @@ class TodoApplicationTests {
 	@Test
 	public void testAuthentication() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
 		LoginRequest request = new LoginRequest();
-		request.setEmail("test1@gmail.com");
-		request.setPassword("P@ssW0$d");
+		request.setEmail("tranfminh@gmail.com");
+		request.setPassword("P@s$1234");
 		request.setClientSecret("8VT9s8b0vX");
 		AuthenticationResponse response = authenticationService.login(request);
 		log.info("{}", response);
@@ -84,11 +84,11 @@ class TodoApplicationTests {
 		String acc = response.getAccessToken();
 		DataRequest dataRequest =  jwtUtilities.getDataRequest(acc);
 		TaskRequest request = new TaskRequest();
-		request.setTitle("test");
-		request.setDescription("test");
+		request.setTitle("test screen home");
+		request.setDescription("");
 		request.setRemind(true);
 		request.setPriority(Priority.HIGH.name());
-		request.setOrganizationId(2L);
+		request.setOrganizationId(1L);
 		taskService.addTask(dataRequest, request);
 	}
 

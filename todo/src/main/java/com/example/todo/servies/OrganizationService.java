@@ -5,6 +5,7 @@ import com.example.todo.constants.Constants;
 import com.example.todo.models.db.Organization;
 import com.example.todo.models.db.Task;
 import com.example.todo.models.db.User;
+import com.example.todo.models.dto.OrganizationDto;
 import com.example.todo.models.request.DataRequest;
 import com.example.todo.models.request.OrganizationMemberRequest;
 import com.example.todo.models.request.OrganizationRequest;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OrganizationService {
@@ -38,8 +41,7 @@ public class OrganizationService {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             currentUser = userDetails.getUser();
-        }
-        else {
+        } else {
             currentUser = this.userRepository.findById(dataRequest.getUserData().getId()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
         }
         Organization organization = new Organization();
@@ -57,8 +59,7 @@ public class OrganizationService {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             currentUser = userDetails.getUser();
-        }
-        else {
+        } else {
             currentUser = this.userRepository.findById(dataRequest.getUserData().getId()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
         }
         Organization organization = this.organizationRepository.findById(request.getOrganizationId()).orElseThrow(() -> new GeneralException(Constants.INVALID_ORGANIZATION));
@@ -80,8 +81,7 @@ public class OrganizationService {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             currentUser = userDetails.getUser();
-        }
-        else {
+        } else {
             currentUser = this.userRepository.findById(dataRequest.getUserData().getId()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
         }
         Organization organization = this.organizationRepository.findById(request.getOrganizationId()).orElseThrow(() -> new GeneralException(Constants.INVALID_ORGANIZATION));
@@ -97,5 +97,10 @@ public class OrganizationService {
         });
         this.taskRepository.saveAll(tasks);
         return new HashMap<>();
+    }
+
+    public Set<OrganizationDto> getAll(DataRequest dataRequest) {
+        return this.organizationRepository.getOrganizationsByUsersId(dataRequest.getUserData().getId())
+                .stream().map(it -> new OrganizationDto(it.getId(), it.getName(), null, it.getLeft(), it.getDone())).collect(Collectors.toSet());
     }
 }

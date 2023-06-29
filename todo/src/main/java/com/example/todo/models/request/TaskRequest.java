@@ -29,7 +29,6 @@ public class TaskRequest {
     public void validate() {
         new CombineValidator()
                 .add(new StringValidator("title", this.getTitle()).empty())
-                .add(new StringValidator("description", this.getDescription()).empty())
                 .add(new EnumValidator("priority", this.getPriority(), Priority.class).validate())
                 .add(new NumberValidator("organizationId", this.getOrganizationId()).notEmpty())
                 .check();

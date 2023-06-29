@@ -26,6 +26,21 @@ public class OrganizationServiceController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @GetMapping
+    public ResponseEntity<Object> getAll(HttpServletRequest request) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.organizationService.getAll(dataRequest));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
+            }
+        }
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Object> create(HttpServletRequest request, @RequestBody OrganizationRequest organizationRequest) {
         try {
