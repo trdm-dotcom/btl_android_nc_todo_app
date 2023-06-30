@@ -89,7 +89,7 @@ public class OrganizationService {
             throw new GeneralException(Constants.NOT_PERMISSION);
         }
         User user = this.userRepository.findById(request.getUserId()).orElseThrow(() -> new GeneralException(Constants.USER_NOT_FOUND));
-        List<Task> tasks = this.taskRepository.findTaskBy(dataRequest.getUserData().getId(), null, null, null, null, null).getContent();
+        List<Task> tasks = this.taskRepository.findTaskBy(dataRequest.getUserData().getId(), null, null, null, null, null, null).getContent();
         user.getOrganizations().remove(organization);
         this.organizationRepository.save(organization);
         tasks.forEach(task -> {

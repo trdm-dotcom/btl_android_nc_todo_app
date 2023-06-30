@@ -1,6 +1,7 @@
 package com.example.todo;
 
 import com.example.todo.constants.enums.Priority;
+import com.example.todo.models.dto.TaskDto;
 import com.example.todo.models.request.*;
 import com.example.todo.models.response.AuthenticationResponse;
 import com.example.todo.models.response.RefreshTokenResponse;
@@ -22,6 +23,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Set;
 
 @SpringBootTest
 @Slf4j
@@ -36,7 +38,7 @@ class TodoApplicationTests {
 	JwtUtilities jwtUtilities;
 	@Autowired
 	TaskService taskService;
-	static final String rf = "7ca43651-25d2-4aba-8699-4c633e754906";
+	static final String rf = "d8b47936-cd1e-4e0e-8d01-7125650611e2";
 
 	@Test
 	public void testRegister() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
@@ -112,5 +114,14 @@ class TodoApplicationTests {
 		request.setContent("ble ble");
 		request.setTask(2L);
 		taskService.addComment(dataRequest, request);
+	}
+
+	@Test
+	public void testGetTask() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		RefreshTokenResponse response = tokenService.refreshToken(rf);
+		String acc = response.getAccessToken();
+		DataRequest dataRequest =  jwtUtilities.getDataRequest(acc);
+		Set<TaskDto> set = taskService.findTaskBy(dataRequest, 100, 0, "20230630", "20230707", null, null, 1L);
+		System.out.println(set);
 	}
 }

@@ -37,12 +37,14 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                 if (start != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     LocalDate date = LocalDate.parse(start, formatter);
-                    predicates.add(criteriaBuilder.and(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), date)));
+                    System.out.println(date);
+                    predicates.add(criteriaBuilder.and(criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), date)));
                 }
                 if (end != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     LocalDate date = LocalDate.parse(end, formatter);
-                    predicates.add(criteriaBuilder.and(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), date)));
+                    System.out.println(date);
+                    predicates.add(criteriaBuilder.and(criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), date)));
                 }
                 if (priority != null) {
                     predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("priority"), priority)));
