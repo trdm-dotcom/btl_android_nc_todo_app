@@ -55,38 +55,20 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_homeFragment_to_taskFormFragment"
-            app:destination="@id/taskFormFragment"
-            app:popUpTo="@id/homeFragment"
-            app:popUpToInclusive="true" />
-
-        <action
-            android:id="@+id/action_homeFragment_to_orgFormFragment"
-            app:destination="@id/organizationFormFragment"
+            android:id="@+id/action_homeFragment_to_mainTaskPageFragment"
+            app:destination="@id/mainTaskPageFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
-        android:id="@+id/taskFormFragment"
-        android:name="com.example.todo.fragments.TaskFormFragment"
-        android:label="fragment task form"
-        tools:layout="@layout/fragment_task_form">
+        android:id="@+id/mainTaskPageFragment"
+        android:name="com.example.todo.fragments.MainTaskPageFragment"
+        android:label="fragment_main_task_page"
+        tools:layout="@layout/fragment_main_task_page">
         <action
-            android:id="@+id/action_taskFormFragment_to_homeFragment"
+            android:id="@+id/action_mainTaskPageFragment_to_homeFragment"
             app:destination="@id/homeFragment"
-            app:popUpTo="@id/taskFormFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/organizationFormFragment"
-        android:name="com.example.todo.fragments.OrganizationFormFragment"
-        android:label="organization task form"
-        tools:layout="@layout/fragment_organization_form">
-        <action
-            android:id="@+id/action_orgFormFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/organizationFormFragment"
+            app:popUpTo="@id/mainTaskPageFragment"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>

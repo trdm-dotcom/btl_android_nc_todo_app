@@ -1,5 +1,6 @@
 package com.example.todo.fragments;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,7 @@ public class SignInFragment extends Fragment {
     private TextInputEditText mailEdt, passEdt;
     private HttpClientHelper httpClientHelper;
     private static final String TAG = SignInFragment.class.getSimpleName();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,24 +54,26 @@ public class SignInFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.init(view);
-        this.textViewSignup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                navController.navigate(R.id.action_signInFragment_to_signUpFragment);
-            }
+        this.textViewSignup.setOnClickListener(v -> {
+            navController.navigate(R.id.action_signInFragment_to_signUpFragment);
         });
-        this.nextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (validateForm()) {
-                    signIn();
-                }
+        this.nextBtn.setOnClickListener(v -> {
+            if (validateForm()) {
+                signIn();
             }
         });
     }
 
     private void signIn() {
         class SignInBackend extends AsyncTask<Void, Void, Object> {
+            ProgressDialog mProgressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = ProgressDialog.show(getActivity(), "", "");
+            }
+
             @Override
             protected Object doInBackground(Void... voids) {
                 try {
@@ -85,13 +89,14 @@ public class SignInFragment extends Fragment {
                     if (e instanceof GeneralException) {
                         return ((GeneralException) e).getCode();
                     }
-                    return null;
+                    return "ERROR";
                 }
             }
 
             @Override
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
+                mProgressDialog.dismiss();
                 if (o instanceof AuthenticationResponse) {
                     AuthenticationResponse response = (AuthenticationResponse) o;
                     httpClientHelper.setAccessToken(response.getAccessToken());

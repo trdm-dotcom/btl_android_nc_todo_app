@@ -1,5 +1,6 @@
 package com.example.todo.fragments;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class SignUpFragment extends Fragment {
     private static final String PASSWORD_REGEX = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W,_])[.!-~]{6,}$";
     private HttpClientHelper httpClientHelper;
     private static final String TAG = SignUpFragment.class.getSimpleName();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +68,7 @@ public class SignUpFragment extends Fragment {
         this.nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateForm()) {
+                if (validateForm()) {
                     doSignUp();
                 }
             }
@@ -75,17 +77,24 @@ public class SignUpFragment extends Fragment {
 
     private void doSignUp() {
         class SignUpBackend extends AsyncTask<Void, Void, String> {
+            ProgressDialog mProgressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = ProgressDialog.show(getActivity(), "", "");
+            }
 
             @Override
             protected String doInBackground(Void... voids) {
                 try {
                     RegisterRequest body = new RegisterRequest(passEdt.getText().toString().trim(), nameEdt.getText().toString().trim(), mailEdt.getText().toString().trim());
                     httpClientHelper.post(
-                            httpClientHelper.buildUrl("auth/register", null),
+                            httpClientHelper.buildUrl("/auth/register", null),
                             body,
                             Object.class);
                     return null;
-                } catch (GeneralException e) {
+                } catch (Exception e) {
                     Log.e(TAG, "error: ", e);
                     if (e instanceof GeneralException) {
                         return ((GeneralException) e).getCode();
@@ -97,7 +106,8 @@ public class SignUpFragment extends Fragment {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
-                if (result.isEmpty()) {
+                mProgressDialog.dismiss();
+                if (result == null) {
                     navController.navigate(R.id.action_signUpFragment_to_signInFragment);
                 } else {
                     CustomToast.makeText(getActivity(), result, CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
@@ -131,7 +141,7 @@ public class SignUpFragment extends Fragment {
         if (password.isEmpty()) {
             this.passEdt.setError("Please enter a password");
             isValid = false;
-        } else if (password.matches(PASSWORD_REGEX)) {
+        } else if (!password.matches(PASSWORD_REGEX)) {
             this.passEdt.setError("Password should contain:\n" +
                     "- Least 6 characters long\n" +
                     "- Least one digit\n" +

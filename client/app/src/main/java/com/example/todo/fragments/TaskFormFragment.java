@@ -1,6 +1,8 @@
 package com.example.todo.fragments;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,10 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
-import android.widget.Switch;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.example.todo.R;
 import com.example.todo.common.GeneralException;
@@ -33,18 +35,22 @@ import java.util.Date;
 public class TaskFormFragment extends BottomSheetDialogFragment {
     private AutoCompleteTextView autoCompleteTextView;
     private TextInputEditText taskStartEdt, taskEndEdt, taskTitleEdt, taskDesEdt;
-    private Switch taskReminderSw;
+    private SwitchCompat taskReminderSw;
     private Calendar calendarStart, calendarEnd;
     private ImageView nextBtn;
     private HttpClientHelper httpClientHelper;
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    OrganizationFormFragment.setRefreshListener setRefreshListener;
+    TaskFormFragment.setRefreshListener setRefreshListener;
     private static final String TAG = SignUpFragment.class.getSimpleName();
+    private int taskId;
+    private boolean isEdit;
+    private Context context;
+
     @Override
     public void onCreate(@org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.httpClientHelper = HttpClientHelper.getInstance(getActivity());
-        if(getArguments() != null) {
+        this.httpClientHelper = HttpClientHelper.getInstance(this.context);
+        if (getArguments() != null) {
             getTask(getArguments().getLong("id"));
         }
     }
@@ -65,7 +71,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         this.calendarEnd.add(Calendar.DAY_OF_MONTH, 7);
         this.taskStartEdt.setHint(dateFormat.format(this.calendarStart.getTime()));
         this.taskStartEdt.setHint(dateFormat.format(this.calendarEnd.getTime()));
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context,
                 android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.priority_dropdown_items));
         this.autoCompleteTextView.setAdapter(adapter);
@@ -75,62 +81,68 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.nextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (validateForm()) {
-                    saveTask();
-                }
+        this.nextBtn.setOnClickListener(v -> {
+            if (validateForm()) {
+                saveTask();
             }
         });
-        this.taskStartEdt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                        getActivity(),
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                                calendarStart.set(Calendar.YEAR, year);
-                                calendarStart.set(Calendar.MONTH, monthOfYear);
-                                calendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                                String selectedDate = dateFormat.format(calendarStart.getTime());
-                                taskStartEdt.setText(selectedDate);
-                            }
-                        },
-                        calendarStart.get(Calendar.YEAR),
-                        calendarStart.get(Calendar.MONTH),
-                        calendarStart.get(Calendar.DAY_OF_MONTH)
-                );
-                datePickerDialog.show();
-            }
+        this.taskStartEdt.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    getActivity(),
+                    new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                            calendarStart.set(Calendar.YEAR, year);
+                            calendarStart.set(Calendar.MONTH, monthOfYear);
+                            calendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                            String selectedDate = dateFormat.format(calendarStart.getTime());
+                            taskStartEdt.setText(selectedDate);
+                        }
+                    },
+                    calendarStart.get(Calendar.YEAR),
+                    calendarStart.get(Calendar.MONTH),
+                    calendarStart.get(Calendar.DAY_OF_MONTH)
+            );
+            datePickerDialog.show();
         });
-        this.taskEndEdt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerDialog datePickerDialog = new DatePickerDialog(
-                        getActivity(),
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                                calendarEnd.set(Calendar.YEAR, year);
-                                calendarEnd.set(Calendar.MONTH, monthOfYear);
-                                calendarEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                                String selectedDate = dateFormat.format(calendarEnd.getTime());
-                                taskEndEdt.setText(selectedDate);
-                            }
-                        },
-                        calendarEnd.get(Calendar.YEAR),
-                        calendarEnd.get(Calendar.MONTH),
-                        calendarEnd.get(Calendar.DAY_OF_MONTH)
-                );
-                datePickerDialog.show();
-            }
+        this.taskEndEdt.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    getActivity(),
+                    new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                            calendarEnd.set(Calendar.YEAR, year);
+                            calendarEnd.set(Calendar.MONTH, monthOfYear);
+                            calendarEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                            String selectedDate = dateFormat.format(calendarEnd.getTime());
+                            taskEndEdt.setText(selectedDate);
+                        }
+                    },
+                    calendarEnd.get(Calendar.YEAR),
+                    calendarEnd.get(Calendar.MONTH),
+                    calendarEnd.get(Calendar.DAY_OF_MONTH)
+            );
+            datePickerDialog.show();
         });
+    }
+
+    public void setTaskId(int taskId, boolean isEdit, setRefreshListener setRefreshListener, Context context) {
+        this.taskId = taskId;
+        this.isEdit = isEdit;
+        this.context = context;
+        this.setRefreshListener = setRefreshListener;
     }
 
     private void saveTask() {
         class SaveTaskInBackend extends AsyncTask<Void, Void, String> {
+            ProgressDialog mProgressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = ProgressDialog.show(getActivity(), "", "");
+            }
+
             @Override
             protected String doInBackground(Void... voids) {
                 TaskRequest body = new TaskRequest();
@@ -158,11 +170,12 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
+                mProgressDialog.dismiss();
                 if (result.isEmpty()) {
                     setRefreshListener.refresh();
                     dismiss();
                 } else {
-                    CustomToast.makeText(getActivity(), result, CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
+                    CustomToast.makeText(context, result, CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 }
             }
         }
@@ -172,6 +185,14 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
 
     private void getTask(Long id) {
         class GetTaskInBackend extends AsyncTask<Long, Void, Object> {
+            ProgressDialog mProgressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = ProgressDialog.show(getActivity(), "", "");
+            }
+
             @Override
             protected Object doInBackground(Long... ids) {
                 try {
@@ -186,6 +207,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
             @Override
             protected void onPostExecute(Object result) {
                 super.onPostExecute(result);
+                mProgressDialog.dismiss();
                 if (result instanceof TaskDto) {
                     taskTitleEdt.setText(((TaskDto) result).getTitle());
                     taskDesEdt.setText(((TaskDto) result).getDescription());
@@ -195,7 +217,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
                     calendarStart.setTime(((TaskDto) result).getStartDate());
                     calendarEnd.setTime(((TaskDto) result).getEndDate());
                 } else {
-                    CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
+                    CustomToast.makeText(context, result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.todo.fragments;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,11 +29,12 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
     private HttpClientHelper httpClientHelper;
     setRefreshListener setRefreshListener;
     private static final String TAG = SignUpFragment.class.getSimpleName();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.httpClientHelper = HttpClientHelper.getInstance(getActivity());
-        if(getArguments() != null) {
+        if (getArguments() != null) {
             getOrganization(getArguments().getLong("id"));
         }
     }
@@ -103,6 +105,13 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
 
     private void getOrganization(Long id) {
         class GetOrganizationInBackend extends AsyncTask<Long, Void, Object> {
+            ProgressDialog mProgressDialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressDialog = ProgressDialog.show(getActivity(), "", "");
+            }
 
             @Override
             protected Object doInBackground(Long... ids) {
@@ -110,14 +119,19 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
                     return httpClientHelper.get(
                             httpClientHelper.buildUrl(String.format("organization/%d", ids), null),
                             OrganizationDto.class);
-                } catch (GeneralException e) {
-                    return e.getMessage();
+                } catch (Exception e) {
+                    Log.e(TAG, "error: ", e);
+                    if (e instanceof GeneralException) {
+                        return ((GeneralException) e).getCode();
+                    }
+                    return "ERROR";
                 }
             }
 
             @Override
             protected void onPostExecute(Object result) {
                 super.onPostExecute(result);
+                mProgressDialog.dismiss();
                 if (result instanceof OrganizationDto) {
                     orgNameEdt.setText(((OrganizationDto) result).getName());
                 } else {

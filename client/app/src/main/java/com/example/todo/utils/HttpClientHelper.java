@@ -257,7 +257,7 @@ public class HttpClientHelper {
     public Uri buildUrl(String path, Map<String, Object> queryParams) {
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("http")
-                .encodedAuthority("192.168.1.118:8083")
+                .encodedAuthority("192.168.101.7:8083")
                 .path("/api/v1" + path);
         if (queryParams != null) {
             queryParams.forEach((key, value) -> {
