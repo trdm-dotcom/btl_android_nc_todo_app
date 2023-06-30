@@ -25,7 +25,7 @@ import java.util.Set;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-    default Page<Task> findTaskBy(Long userId, String strDate, Priority priority, TaskStatus status, Long organization, Pageable pageable) {
+    default Page<Task> findTaskBy(Long userId, String start, String end, Priority priority, TaskStatus status, Long organization, Pageable pageable) {
         return this.findAll(new Specification<Task>() {
             @Override
             public Predicate toPredicate(Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
@@ -34,10 +34,14 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                 if (organization != null) {
                     predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("organization").get("id"), organization)));
                 }
-                if (strDate != null) {
+                if (start != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                    LocalDate date = LocalDate.parse(strDate, formatter);
+                    LocalDate date = LocalDate.parse(start, formatter);
                     predicates.add(criteriaBuilder.and(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), date)));
+                }
+                if (end != null) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                    LocalDate date = LocalDate.parse(end, formatter);
                     predicates.add(criteriaBuilder.and(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), date)));
                 }
                 if (priority != null) {

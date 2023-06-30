@@ -81,12 +81,13 @@ public class TaskController {
     public ResponseEntity<Set<TaskDto>> getTasks(HttpServletRequest request,
                                                  @RequestParam(value = "pageSize", required = false) Integer pageSize,
                                                  @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-                                                 @RequestParam(value = "date", required = false) String date,
+                                                 @RequestParam(value = "start", required = false) String start,
+                                                 @RequestParam(value = "end", required = false) String end,
                                                  @RequestParam(value = "priority", required = false) Priority priority,
                                                  @RequestParam(value = "taskStatus", required = false) TaskStatus taskStatus,
                                                  @RequestParam(value = "organization", required = false) Long organization) {
         DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
-        return ResponseEntity.ok(this.taskService.findTaskBy(dataRequest, pageSize, pageNumber, date, priority, taskStatus, organization));
+        return ResponseEntity.ok(this.taskService.findTaskBy(dataRequest, pageSize, pageNumber, start, end, priority, taskStatus, organization));
     }
 
     @GetMapping("/{task}")
