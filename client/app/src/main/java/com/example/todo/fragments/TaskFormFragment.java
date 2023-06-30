@@ -81,48 +81,57 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.nextBtn.setOnClickListener(v -> {
-            if (validateForm()) {
-                saveTask();
+        this.nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (validateForm()) {
+                    saveTask();
+                }
             }
         });
-        this.taskStartEdt.setOnClickListener(v -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    getActivity(),
-                    new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                            calendarStart.set(Calendar.YEAR, year);
-                            calendarStart.set(Calendar.MONTH, monthOfYear);
-                            calendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                            String selectedDate = dateFormat.format(calendarStart.getTime());
-                            taskStartEdt.setText(selectedDate);
-                        }
-                    },
-                    calendarStart.get(Calendar.YEAR),
-                    calendarStart.get(Calendar.MONTH),
-                    calendarStart.get(Calendar.DAY_OF_MONTH)
-            );
-            datePickerDialog.show();
+        this.taskStartEdt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                                calendarStart.set(Calendar.YEAR, year);
+                                calendarStart.set(Calendar.MONTH, monthOfYear);
+                                calendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                                String selectedDate = dateFormat.format(calendarStart.getTime());
+                                taskStartEdt.setText(selectedDate);
+                            }
+                        },
+                        calendarStart.get(Calendar.YEAR),
+                        calendarStart.get(Calendar.MONTH),
+                        calendarStart.get(Calendar.DAY_OF_MONTH)
+                );
+                datePickerDialog.show();
+            }
         });
-        this.taskEndEdt.setOnClickListener(v -> {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    getActivity(),
-                    new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
-                            calendarEnd.set(Calendar.YEAR, year);
-                            calendarEnd.set(Calendar.MONTH, monthOfYear);
-                            calendarEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                            String selectedDate = dateFormat.format(calendarEnd.getTime());
-                            taskEndEdt.setText(selectedDate);
-                        }
-                    },
-                    calendarEnd.get(Calendar.YEAR),
-                    calendarEnd.get(Calendar.MONTH),
-                    calendarEnd.get(Calendar.DAY_OF_MONTH)
-            );
-            datePickerDialog.show();
+        this.taskEndEdt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        getActivity(),
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                                calendarEnd.set(Calendar.YEAR, year);
+                                calendarEnd.set(Calendar.MONTH, monthOfYear);
+                                calendarEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                                String selectedDate = dateFormat.format(calendarEnd.getTime());
+                                taskEndEdt.setText(selectedDate);
+                            }
+                        },
+                        calendarEnd.get(Calendar.YEAR),
+                        calendarEnd.get(Calendar.MONTH),
+                        calendarEnd.get(Calendar.DAY_OF_MONTH)
+                );
+                datePickerDialog.show();
+            }
         });
     }
 

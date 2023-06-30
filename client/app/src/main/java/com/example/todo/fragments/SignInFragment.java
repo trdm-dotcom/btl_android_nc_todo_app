@@ -54,12 +54,18 @@ public class SignInFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.init(view);
-        this.textViewSignup.setOnClickListener(v -> {
-            navController.navigate(R.id.action_signInFragment_to_signUpFragment);
+        this.textViewSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                navController.navigate(R.id.action_signInFragment_to_signUpFragment);
+            }
         });
-        this.nextBtn.setOnClickListener(v -> {
-            if (validateForm()) {
-                signIn();
+        this.nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (validateForm()) {
+                    signIn();
+                }
             }
         });
     }

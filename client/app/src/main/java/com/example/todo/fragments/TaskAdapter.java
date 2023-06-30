@@ -66,26 +66,35 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         final TaskDto task = taskList.get(position);
         Dialog dialog = new Dialog(context);
         dialog.setContentView(R.layout.dialog_task_options);
-        dialog.findViewById(R.id.btn_close).setOnClickListener(v -> {
-            dialog.dismiss();
+        dialog.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
         });
-        dialog.findViewById(R.id.btn_completed).setOnClickListener(v -> {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-            alertDialogBuilder.setTitle(R.string.confirmation)
-                    .setMessage(R.string.sureToMarkAsComplete)
-                    .setPositiveButton(R.string.yes, (dia, which) -> {
-                        completeTask(task, position);
-                    })
-                    .setNegativeButton(R.string.no, (dia, which) -> dia.cancel()).show();
+        dialog.findViewById(R.id.btn_completed).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
+                alertDialogBuilder.setTitle(R.string.confirmation)
+                        .setMessage(R.string.sureToMarkAsComplete)
+                        .setPositiveButton(R.string.yes, (dia, which) -> {
+                            completeTask(task, position);
+                        })
+                        .setNegativeButton(R.string.no, (dia, which) -> dia.cancel()).show();
+            }
         });
-        dialog.findViewById(R.id.btn_delete).setOnClickListener(v -> {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-            alertDialogBuilder.setTitle(R.string.delete_confirmation)
-                    .setMessage(R.string.sureToDelete)
-                    .setPositiveButton(R.string.yes, (dia, which) -> {
-                        deleteTask(task, position);
-                    })
-                    .setNegativeButton(R.string.no, (dia, which) -> dia.cancel()).show();
+        dialog.findViewById(R.id.btn_delete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
+                alertDialogBuilder.setTitle(R.string.delete_confirmation)
+                        .setMessage(R.string.sureToDelete)
+                        .setPositiveButton(R.string.yes, (dia, which) -> {
+                            deleteTask(task, position);
+                        })
+                        .setNegativeButton(R.string.no, (dia, which) -> dia.cancel()).show();
+            }
         });
     }
 

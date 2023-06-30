@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -24,9 +25,12 @@ import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.TaskDto;
 import com.example.todo.utils.HttpClientHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,12 +47,19 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
     private Long organization;
     private static final String TAG = MainTaskPageFragment.class.getSimpleName();
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
+    private MaterialDatePicker materialDatePicker;
+    private Date startDate, endDate;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.httpClientHelper = HttpClientHelper.getInstance(getActivity());
         this.organization = (getArguments().getLong("organization"));
+        MaterialDatePicker.Builder<Pair<Long, Long>> materialDateBuilder = MaterialDatePicker.Builder.dateRangePicker();
+        this.materialDatePicker = materialDateBuilder.build();
+        Calendar calendar = Calendar.getInstance();
+        this.startDate = calendar.getTime();
+        calendar.add(Calendar.DAY_OF_MONTH, 7);
+        this.endDate = calendar.getTime();
     }
 
     @Nullable
@@ -59,7 +70,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
         this.taskRecycler = rootView.findViewById(R.id.mainRecyclerView);
         this.addTask = rootView.findViewById(R.id.addTask);
         this.back = rootView.findViewById(R.id.back);
-        this.getSavedTasks(new Date());
+        this.getSavedTasks(this.startDate, this.endDate);
         return rootView;
     }
 
@@ -67,14 +78,42 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.init(view);
-        this.calendar.setOnClickListener(v -> {
-
+        this.calendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                materialDatePicker.show(getFragmentManager(), "MATERIAL_DATE_PICKER");
+            }
+        });
+        materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
+            @Override
+            public void onPositiveButtonClick(Object selection) {
+                if(selection != null) {
+                    Pair<Long, Long> selectionDate = (Pair<Long, Long>) selection;
+                    startDate = new Date(selectionDate.first);
+                    if(selectionDate.second != null) {
+                        endDate = new Date(selectionDate.second);
+                    }
+                    else {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(startDate);
+                        calendar.add(Calendar.DAY_OF_MONTH, 7);
+                        endDate = calendar.getTime();
+                    }
+                    Log.i(TAG, "onPositiveButtonClick: " + startDate + " " + endDate);
+                    getSavedTasks(startDate, endDate);
+                }
+            }
         });
         this.addTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 TaskFormFragment taskFormFragment = new TaskFormFragment();
-//                taskFormFragment.setTaskId(0, false, ,getActivity());
+                taskFormFragment.setTaskId(0, false, new TaskFormFragment.setRefreshListener() {
+                    @Override
+                    public void refresh() {
+                        getSavedTasks(startDate, endDate);
+                    }
+                }, getActivity());
                 taskFormFragment.show(getFragmentManager(), taskFormFragment.getTag());
             }
         });
@@ -92,7 +131,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
         this.taskRecycler.setAdapter(this.taskAdapter);
     }
 
-    private void getSavedTasks(Date date) {
+    private void getSavedTasks(Date startDate, Date endDate) {
         class GetSavedTasks extends AsyncTask<Date, Void, Object> {
             ProgressDialog mProgressDialog;
 
@@ -106,7 +145,10 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
             protected Object doInBackground(Date... dates) {
                 try {
                     Map<String, Object> queryParams = new HashMap<>();
-                    queryParams.put("date", dateFormat.format(dates[0]));
+                    queryParams.put("start", dateFormat.format(dates[0]));
+                    if(dates[1] != null) {
+                        queryParams.put("end", dateFormat.format(dates[1]));
+                    }
                     queryParams.put("organization", organization);
                     return httpClientHelper.get(httpClientHelper.buildUrl("/task", queryParams), new TypeReference<List<TaskDto>>() {
                     });
@@ -132,7 +174,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
             }
         }
         GetSavedTasks savedTasks = new GetSavedTasks();
-        savedTasks.execute(date);
+        savedTasks.execute(startDate, endDate);
     }
 
     private void init(View view) {
@@ -141,6 +183,6 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
 
     @Override
     public void refresh() {
-        getSavedTasks(new Date());
+        getSavedTasks(this.startDate, this .endDate);
     }
 }
