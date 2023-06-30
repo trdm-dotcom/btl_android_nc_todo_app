@@ -25,12 +25,15 @@ import java.util.Set;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-    default Page<Task> findTaskBy(Long userId, String strDate, Priority priority, TaskStatus status, Pageable pageable) {
+    default Page<Task> findTaskBy(Long userId, String strDate, Priority priority, TaskStatus status, Long organization, Pageable pageable) {
         return this.findAll(new Specification<Task>() {
             @Override
             public Predicate toPredicate(Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicates = new ArrayList<>();
                 predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.join("assignees").get("id"), userId)));
+                if (organization != null) {
+                    predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("organization").get("id"), organization)));
+                }
                 if (strDate != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     LocalDate date = LocalDate.parse(strDate, formatter);

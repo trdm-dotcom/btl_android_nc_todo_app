@@ -122,11 +122,11 @@ public class TaskService {
         return new HashMap<>();
     }
 
-    public Set<TaskDto> findTaskBy(DataRequest dataRequest, Integer pageSize, Integer pageNumber, String date, Priority priority, TaskStatus status) {
+    public Set<TaskDto> findTaskBy(DataRequest dataRequest, Integer pageSize, Integer pageNumber, String date, Priority priority, TaskStatus status, Long organization) {
         Integer fetchCount = pageSize == null ? Constants.DEFAULT_FETCH_COUNT : Math.min(pageSize, Constants.MAX_FETCH_COUNT);
         Integer offset = pageNumber == null ? Constants.DEFAULT_OFFSET : Math.max(0, pageNumber);
         Pageable pageable = PageRequest.of(offset, fetchCount);
-        return this.taskRepository.findTaskBy(dataRequest.getUserData().getId(), date, priority, status, pageable).stream()
+        return this.taskRepository.findTaskBy(dataRequest.getUserData().getId(), date, priority, status, organization, pageable).stream()
                 .map(task -> new TaskDto(task.getId(),
                                 task.getTitle(),
                                 task.getDescription(),

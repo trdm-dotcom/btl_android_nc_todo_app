@@ -79,13 +79,14 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<Set<TaskDto>> getTasks(HttpServletRequest request,
-                                                 @RequestParam Integer pageSize,
-                                                 @RequestParam Integer pageNumber,
-                                                 @RequestParam String date,
-                                                 @RequestParam Priority priority,
-                                                 @RequestParam TaskStatus taskStatus) {
+                                                 @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                                 @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                                 @RequestParam(value = "date", required = false) String date,
+                                                 @RequestParam(value = "priority", required = false) Priority priority,
+                                                 @RequestParam(value = "taskStatus", required = false) TaskStatus taskStatus,
+                                                 @RequestParam(value = "organization", required = false) Long organization) {
         DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
-        return ResponseEntity.ok(this.taskService.findTaskBy(dataRequest, pageSize, pageNumber, date, priority, taskStatus));
+        return ResponseEntity.ok(this.taskService.findTaskBy(dataRequest, pageSize, pageNumber, date, priority, taskStatus, organization));
     }
 
     @GetMapping("/{task}")
