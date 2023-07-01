@@ -7,6 +7,7 @@ import com.example.todo.constants.enums.TaskStatus;
 import com.example.todo.models.db.Comment;
 import com.example.todo.models.db.Task;
 import com.example.todo.models.db.User;
+import com.example.todo.models.dto.OrganizationDto;
 import com.example.todo.models.dto.TaskDto;
 import com.example.todo.models.dto.UserData;
 import com.example.todo.models.request.AssigneeRequest;
@@ -63,8 +64,7 @@ public class TaskService {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             currentUser = userDetails.getUser();
-        }
-        else {
+        } else {
             currentUser = this.userRepository.findById(dataRequest.getUserData().getId()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
         }
         Task task = new Task();
@@ -72,7 +72,7 @@ public class TaskService {
         task.setDescription(request.getDescription());
         Set<User> assignees = new HashSet<>();
         assignees.add(currentUser);
-        if(!CollectionUtils.isEmpty(request.getAssignees())) {
+        if (!CollectionUtils.isEmpty(request.getAssignees())) {
             Set<User> users = this.userRepository.findByIdIn(request.getAssignees());
             assignees.addAll(users);
         }
@@ -137,7 +137,8 @@ public class TaskService {
                                 task.getPriority(),
                                 task.getAssignees().stream()
                                         .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
-                                        .collect(Collectors.toSet())
+                                        .collect(Collectors.toSet()),
+                                new OrganizationDto(task.getOrganization().getId(), task.getOrganization().getName(), null, null, null)
                         )
                 )
                 .collect(Collectors.toSet());
@@ -155,7 +156,8 @@ public class TaskService {
                 task.getPriority(),
                 task.getAssignees().stream()
                         .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toSet()),
+                new OrganizationDto(task.getOrganization().getId(), task.getOrganization().getName(), null, null, null)
         );
     }
 
@@ -174,7 +176,7 @@ public class TaskService {
         request.validate();
         User user = this.userRepository.findById(request.getAssignee()).orElseThrow(() -> new GeneralException(Constants.USER_NOT_FOUND));
         Task task = this.taskRepository.findById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));
-        if(!user.getOrganizations().contains(task.getOrganization())) {
+        if (!user.getOrganizations().contains(task.getOrganization())) {
             throw new GeneralException(Constants.USER_NOT_IN_ORGANIZATION);
         }
         Set<Long> assignees = task.getAssignees().stream().map(User::getId).collect(Collectors.toSet());
@@ -196,8 +198,7 @@ public class TaskService {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             currentUser = userDetails.getUser();
-        }
-        else {
+        } else {
             currentUser = this.userRepository.findById(dataRequest.getUserData().getId()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
         }
         Task task = this.taskRepository.findById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));

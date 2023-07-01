@@ -22,4 +22,5 @@ public class TaskDto {
     private TaskStatus status;
     private Priority priority;
     private Set<UserData> assignees;
+    private OrganizationDto organization;
 }
