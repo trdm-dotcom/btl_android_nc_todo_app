@@ -109,7 +109,7 @@ public class TaskOptionsFragment extends BottomSheetDialogFragment {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    httpClientHelper.put(httpClientHelper.buildUrl(String.format("tasks/%d/status/%s", taskId, "DONE"), null), null, Object.class);
+                    httpClientHelper.put(httpClientHelper.buildUrl(String.format("/task/%d/status/%s", taskId, "DONE"), null), null, Object.class);
                     return null;
                 } catch (Exception e) {
                     Log.e(TAG, "error: ", e);
@@ -141,7 +141,7 @@ public class TaskOptionsFragment extends BottomSheetDialogFragment {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
-                    httpClientHelper.delete(httpClientHelper.buildUrl(String.format("tasks/%d", taskId), null), Object.class);
+                    httpClientHelper.delete(httpClientHelper.buildUrl(String.format("/task/%d", taskId), null), Object.class);
                     return null;
                 } catch (Exception e) {
                     Log.e(TAG, "error: ", e);

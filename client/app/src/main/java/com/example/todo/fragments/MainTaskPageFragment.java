@@ -49,6 +49,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     private MaterialDatePicker materialDatePicker;
     private Date startDate, endDate;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,13 +88,12 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
         materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener() {
             @Override
             public void onPositiveButtonClick(Object selection) {
-                if(selection != null) {
+                if (selection != null) {
                     Pair<Long, Long> selectionDate = (Pair<Long, Long>) selection;
                     startDate = new Date(selectionDate.first);
-                    if(selectionDate.second != null) {
+                    if (selectionDate.second != null) {
                         endDate = new Date(selectionDate.second);
-                    }
-                    else {
+                    } else {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(startDate);
                         calendar.add(Calendar.DAY_OF_MONTH, 7);
@@ -127,6 +127,24 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
 
     private void setUpAdapter() {
         this.taskAdapter = new TaskAdapter(getActivity(), tasks, this::refresh);
+        this.taskAdapter.setOnItemClickListener(new TaskAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(TaskDto item) {
+            }
+        });
+        this.taskAdapter.setOnItemLongClickListener(new TaskAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(TaskDto item, int position) {
+                TaskOptionsFragment taskOptionsFragment = new TaskOptionsFragment();
+                taskOptionsFragment.setTaskId(item.getId(), organization, position, new TaskOptionsFragment.setRefreshListener() {
+                    @Override
+                    public void refresh() {
+                        getSavedTasks(startDate, endDate);
+                    }
+                }, getActivity());
+                taskOptionsFragment.show(getFragmentManager(), taskOptionsFragment.getTag());
+            }
+        });
         this.taskRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         this.taskRecycler.setAdapter(this.taskAdapter);
     }
@@ -146,7 +164,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
                 try {
                     Map<String, Object> queryParams = new HashMap<>();
                     queryParams.put("start", dateFormat.format(dates[0]));
-                    if(dates[1] != null) {
+                    if (dates[1] != null) {
                         queryParams.put("end", dateFormat.format(dates[1]));
                     }
                     queryParams.put("organization", organization);
@@ -183,6 +201,6 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
 
     @Override
     public void refresh() {
-        getSavedTasks(this.startDate, this .endDate);
+        getSavedTasks(this.startDate, this.endDate);
     }
 }

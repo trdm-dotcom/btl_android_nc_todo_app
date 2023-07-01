@@ -4,42 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardUseCompatPadding="true"
-    app:cardElevation="5dp"
     app:cardCornerRadius="27dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true"
     app:contentPadding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.2"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:layout_weight="0.2"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Full house"
-                android:singleLine="true"
-                android:textSize="20sp"
-                android:layout_weight="1"
-                android:id="@+id/title"
-                android:textColor="@color/black"
-                android:fontFamily="@font/inter_regular"/>
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:id="@+id/options"
-                android:background="@drawable/more"/>
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_regular"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            tools:text="Full house" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,54 +37,54 @@
             <ImageView
                 android:layout_width="20sp"
                 android:layout_height="20sp"
-                android:background="@drawable/calendar"/>
+                android:background="@drawable/calendar" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="25/6/2023"
-                android:singleLine="true"
                 android:id="@+id/start"
-                android:textSize="14sp"
-                android:textColor="@color/black"
-                android:layout_marginLeft="5sp"/>
-
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="25/6/2023"
+                android:layout_marginLeft="5sp"
                 android:singleLine="true"
-                android:id="@+id/end"
-                android:textSize="14sp"
                 android:textColor="@color/black"
-                android:layout_marginLeft="5sp"/>
+                android:textSize="14sp"
+                tools:text="25/6/2023" />
+
+            <TextView
+                android:id="@+id/end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5sp"
+                android:singleLine="true"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:text="25/6/2023" />
         </LinearLayout>
 
         <TextView
+            android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Full House is the Grand prize in any Tambola game played. It means all 15 Numbers of a ticket are cut, striked out"
-            android:singleLine="true"
             android:alpha="0.5"
-            android:id="@+id/description"
-            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:singleLine="true"
             android:textColor="@color/black"
-            android:fontFamily="@font/inter_regular"/>
+            android:textSize="14sp"
+            tools:text="Full House is the Grand prize in any Tambola game played. It means all 15 Numbers of a ticket are cut, striked out" />
 
         <TextView
+            android:id="@+id/status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:text="DONE"
-            android:textSize="13sp"
-            android:id="@+id/status"
             android:layout_gravity="right"
             android:layout_marginTop="10dp"
+            android:fontFamily="@font/inter_semi_bold"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:paddingTop="5dp"
+            android:paddingRight="10dp"
             android:paddingBottom="5dp"
-            android:fontFamily="@font/inter_semi_bold"/>
+            android:text="DONE"
+            android:textColor="@android:color/black"
+            android:textSize="13sp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
