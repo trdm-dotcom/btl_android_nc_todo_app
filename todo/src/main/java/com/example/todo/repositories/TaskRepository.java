@@ -37,13 +37,11 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                 if (start != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     LocalDate date = LocalDate.parse(start, formatter);
-                    System.out.println(date);
                     predicates.add(criteriaBuilder.and(criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), date)));
                 }
                 if (end != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                     LocalDate date = LocalDate.parse(end, formatter);
-                    System.out.println(date);
                     predicates.add(criteriaBuilder.and(criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), date)));
                 }
                 if (priority != null) {
@@ -52,6 +50,7 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                 if (status != null) {
                     predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("status"), status)));
                 }
+                query.orderBy(criteriaBuilder.asc(root.get("startDate")));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         }, pageable);
