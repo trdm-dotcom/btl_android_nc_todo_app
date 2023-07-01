@@ -108,7 +108,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
             @Override
             public void onClick(View view) {
                 TaskFormFragment taskFormFragment = new TaskFormFragment();
-                taskFormFragment.setTaskId(0, false, new TaskFormFragment.setRefreshListener() {
+                taskFormFragment.setTaskId(0L, organization, false, new TaskFormFragment.setRefreshListener() {
                     @Override
                     public void refresh() {
                         getSavedTasks(startDate, endDate);

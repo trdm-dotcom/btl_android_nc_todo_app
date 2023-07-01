@@ -26,11 +26,13 @@ public class TaskDto {
     private Set<UserData> assignees;
     @SerializedName("reminder")
     private Boolean reminder;
+    @SerializedName("organization")
+    private OrganizationDto organization;
 
     public TaskDto() {
     }
 
-    public TaskDto(Long id, String title, String description, String colorCode, Date startDate, Date endDate, String status, String priority, Set<UserData> assignees) {
+    public TaskDto(Long id, String title, String description, String colorCode, Date startDate, Date endDate, String status, String priority, Set<UserData> assignees, OrganizationDto organization) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -40,6 +42,7 @@ public class TaskDto {
         this.status = status;
         this.priority = priority;
         this.assignees = assignees;
+        this.organization = organization;
     }
 
     public Long getId() {
@@ -120,5 +123,13 @@ public class TaskDto {
 
     public void setReminder(Boolean reminder) {
         this.reminder = reminder;
+    }
+
+    public OrganizationDto getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(OrganizationDto organization) {
+        this.organization = organization;
     }
 }

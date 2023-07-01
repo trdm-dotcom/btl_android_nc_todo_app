@@ -24,6 +24,7 @@ import com.example.todo.model.dto.OrganizationDto;
 import com.example.todo.model.dto.UserData;
 import com.example.todo.utils.HttpClientHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
     private HttpClientHelper httpClientHelper;
     private TextView name;
     private static final String TAG = HomeFragment.class.getSimpleName();
+    private FloatingActionButton btnAdd;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         this.taskRecycler = rootView.findViewById(R.id.mainRecyclerView);
         this.name = rootView.findViewById(R.id.name);
+        this.btnAdd = rootView.findViewById(R.id.addOrg);
         this.getUserInfo();
         this.getSavedOrganizations();
         return rootView;
@@ -58,6 +61,19 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.init(view);
+        this.btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OrganizationFormFragment organizationFormFragment = new OrganizationFormFragment();
+                organizationFormFragment.setOrgId(0L, false, new OrganizationFormFragment.setRefreshListener() {
+                    @Override
+                    public void refresh() {
+                        getSavedOrganizations();
+                    }
+                }, getActivity());
+                organizationFormFragment.show(getParentFragmentManager(), organizationFormFragment.getTag());
+            }
+        });
     }
 
     private void setUpAdapter() {
@@ -77,12 +93,10 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
 
     private void getSavedOrganizations() {
         class GetSavedOrganizations extends AsyncTask<Void, Void, Object> {
-            ProgressDialog mProgressDialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                mProgressDialog = ProgressDialog.show(getActivity(), "", "");
             }
 
             @Override
@@ -103,7 +117,6 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
             @Override
             protected void onPostExecute(Object result) {
                 super.onPostExecute(result);
-                mProgressDialog.dismiss();
                 if (result instanceof String) {
                     CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 } else {

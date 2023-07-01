@@ -40,11 +40,12 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
     private ImageView nextBtn;
     private HttpClientHelper httpClientHelper;
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    TaskFormFragment.setRefreshListener setRefreshListener;
+    private setRefreshListener setRefreshListener;
     private static final String TAG = SignUpFragment.class.getSimpleName();
-    private int taskId;
+    private long taskId;
     private boolean isEdit;
     private Context context;
+    private long organization;
 
     @Override
     public void onCreate(@org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -59,7 +60,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_task_form, container, false);
-        this.taskStartEdt = rootView.findViewById(R.id.taskEndDateEdt);
+        this.taskStartEdt = rootView.findViewById(R.id.taskStartDateEdt);
         this.taskEndEdt = rootView.findViewById(R.id.taskEndDateEdt);
         this.autoCompleteTextView = rootView.findViewById(R.id.priorityDropdownMenu);
         this.nextBtn = rootView.findViewById(R.id.nextBtn);
@@ -69,8 +70,8 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         this.calendarStart = Calendar.getInstance();
         this.calendarEnd = Calendar.getInstance();
         this.calendarEnd.add(Calendar.DAY_OF_MONTH, 7);
-        this.taskStartEdt.setHint(dateFormat.format(this.calendarStart.getTime()));
-        this.taskStartEdt.setHint(dateFormat.format(this.calendarEnd.getTime()));
+        this.taskStartEdt.setText(dateFormat.format(this.calendarStart.getTime()));
+        this.taskEndEdt.setText(dateFormat.format(this.calendarEnd.getTime()));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context,
                 android.R.layout.simple_dropdown_item_1line,
                 getResources().getStringArray(R.array.priority_dropdown_items));
@@ -135,10 +136,11 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         });
     }
 
-    public void setTaskId(int taskId, boolean isEdit, setRefreshListener setRefreshListener, Context context) {
+    public void setTaskId(long taskId, long organization, boolean isEdit, setRefreshListener setRefreshListener, Context context) {
         this.taskId = taskId;
         this.isEdit = isEdit;
         this.context = context;
+        this.organization = organization;
         this.setRefreshListener = setRefreshListener;
     }
 
@@ -154,16 +156,18 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
 
             @Override
             protected String doInBackground(Void... voids) {
+                SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
                 TaskRequest body = new TaskRequest();
                 body.setTitle(taskTitleEdt.getText().toString().trim());
                 body.setDescription(taskDesEdt.getText().toString().trim());
                 body.setPriority(autoCompleteTextView.getText().toString().trim());
                 body.setRemind(taskReminderSw.isChecked());
-                body.setStartDate(dateFormat.format(calendarStart.getTime()));
-                body.setEndDate(dateFormat.format(calendarEnd.getTime()));
+                body.setStartDate(df.format(calendarStart.getTime()));
+                body.setEndDate(df.format(calendarEnd.getTime()));
+                body.setOrganizationId(organization);
                 try {
                     httpClientHelper.post(
-                            httpClientHelper.buildUrl("task", null),
+                            httpClientHelper.buildUrl("/task", null),
                             body,
                             Object.class);
                     return null;
@@ -180,7 +184,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
                 mProgressDialog.dismiss();
-                if (result.isEmpty()) {
+                if (result == null) {
                     setRefreshListener.refresh();
                     dismiss();
                 } else {
@@ -238,8 +242,8 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         boolean isValid = true;
         String title = this.taskTitleEdt.getText().toString().trim();
         Date now = new Date();
-        Date startDate = new Date(this.taskStartEdt.getText().toString().trim());
-        Date endDate = new Date(this.taskEndEdt.getText().toString().trim());
+        Date startDate = calendarStart.getTime();
+        Date endDate = calendarEnd.getTime();
         if (title.isEmpty()) {
             this.taskTitleEdt.setError("Title is required");
             isValid = false;

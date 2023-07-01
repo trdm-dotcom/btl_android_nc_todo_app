@@ -27,7 +27,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     private LayoutInflater inflater;
     private List<TaskDto> taskList;
     private Context context;
-    private HttpClientHelper httpClientHelper;
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     TaskFormFragment.setRefreshListener setRefreshListener;
     private static final String TAG = TaskAdapter.class.getSimpleName();
@@ -57,91 +56,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.options.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopUpMenu(view, position);
-            }
-        });
-    }
-
-    private void showPopUpMenu(View view, int position) {
-        final TaskDto task = taskList.get(position);
-        Dialog dialog = new Dialog(context);
-        dialog.setContentView(R.layout.dialog_task_options);
-        dialog.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-        dialog.findViewById(R.id.btn_completed).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-                alertDialogBuilder.setTitle(R.string.confirmation)
-                        .setMessage(R.string.sureToMarkAsComplete)
-                        .setPositiveButton(R.string.yes, (dia, which) -> {
-                            completeTask(task, position);
-                        })
-                        .setNegativeButton(R.string.no, (dia, which) -> dia.cancel()).show();
-            }
-        });
-        dialog.findViewById(R.id.btn_delete).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
-                alertDialogBuilder.setTitle(R.string.delete_confirmation)
-                        .setMessage(R.string.sureToDelete)
-                        .setPositiveButton(R.string.yes, (dia, which) -> {
-                            deleteTask(task, position);
-                        })
-                        .setNegativeButton(R.string.no, (dia, which) -> dia.cancel()).show();
-            }
-        });
-    }
-
-    private void completeTask(TaskDto task, int position) {
-        class UpdateTask extends AsyncTask<Void, Void, String> {
-            @Override
-            protected String doInBackground(Void... voids) {
-                try {
-                    return null;
-                } catch (Exception e) {
-                    Log.e(TAG, "error: ", e);
-                    if (e instanceof GeneralException) {
-                        return ((GeneralException) e).getCode();
+                TaskOptionsFragment taskOptionsFragment = new TaskOptionsFragment();
+                taskOptionsFragment.setTaskId(task.getId(), task.getOrganization().getId(), position, new TaskOptionsFragment.setRefreshListener() {
+                    @Override
+                    public void refresh() {
+                        setRefreshListener.refresh();
                     }
-                    return "ERROR";
-                }
+                }, context);
             }
-
-            @Override
-            protected void onPostExecute(String result) {
-                super.onPostExecute(result);
-                updateAtPosition(position);
-                setRefreshListener.refresh();
-            }
-        }
-
-        UpdateTask updateTask = new UpdateTask();
-        updateTask.execute();
-    }
-
-    private void deleteTask(TaskDto task, int position) {
-        class DeleteTask extends AsyncTask<Void, Void, List<TaskDto>> {
-            @Override
-            protected List<TaskDto> doInBackground(Void... voids) {
-                return taskList;
-            }
-
-            @Override
-            protected void onPostExecute(List<TaskDto> tasks) {
-                super.onPostExecute(tasks);
-                removeAtPosition(position);
-                setRefreshListener.refresh();
-            }
-        }
-
-        DeleteTask deleteTask = new DeleteTask();
-        deleteTask.execute();
+        });
     }
 
     private void removeAtPosition(int position) {
@@ -150,7 +73,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         notifyItemRangeChanged(position, taskList.size());
     }
 
-    private void updateAtPosition(int position) {
+    private void updateStatusAtPosition(int position) {
         TaskDto taskDto = taskList.get(position);
         taskDto.setStatus("DONE");
         taskList.set(position, taskDto);

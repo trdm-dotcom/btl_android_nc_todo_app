@@ -1,6 +1,7 @@
 package com.example.todo.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,8 +28,11 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
     private TextInputEditText orgNameEdt;
     private ImageView nextBtn;
     private HttpClientHelper httpClientHelper;
-    setRefreshListener setRefreshListener;
+    private setRefreshListener setRefreshListener;
     private static final String TAG = SignUpFragment.class.getSimpleName();
+    private long orgId;
+    private boolean isEdit;
+    private Context context;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +65,13 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
         });
     }
 
+    public void setOrgId(long orgId, boolean isEdit, OrganizationFormFragment.setRefreshListener setRefreshListener, Context context) {
+        this.orgId = orgId;
+        this.isEdit = isEdit;
+        this.setRefreshListener = setRefreshListener;
+        this.context = context;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -75,7 +86,7 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
                     OrganizationRequest body = new OrganizationRequest();
                     body.setName(orgNameEdt.getText().toString().trim());
                     httpClientHelper.post(
-                            httpClientHelper.buildUrl("organization/create", null),
+                            httpClientHelper.buildUrl("/organization/create", null),
                             body,
                             Object.class);
                     return null;
@@ -91,7 +102,7 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
-                if (result.isEmpty()) {
+                if (result == null) {
                     setRefreshListener.refresh();
                     dismiss();
                 } else {
