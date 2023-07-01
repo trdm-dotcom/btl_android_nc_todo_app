@@ -101,6 +101,6 @@ public class OrganizationService {
 
     public Set<OrganizationDto> getAll(DataRequest dataRequest) {
         return this.organizationRepository.getOrganizationsByUsersId(dataRequest.getUserData().getId())
-                .stream().map(it -> new OrganizationDto(it.getId(), it.getName(), null, it.getLeft(), it.getDone())).collect(Collectors.toSet());
+                .stream().map(it -> new OrganizationDto(it.getId(), it.getName(), null, it.getDone(), it.getLeft())).collect(Collectors.toSet());
     }
 }
