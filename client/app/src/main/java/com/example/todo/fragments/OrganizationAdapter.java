@@ -74,8 +74,10 @@ public class OrganizationAdapter extends RecyclerView.Adapter<OrganizationAdapte
         public void onClick(View view) {
             if (listener != null) {
                 int position = getAdapterPosition();
-                OrganizationDto item = organizationList.get(position);
-                listener.onItemClick(item);
+                if (position > RecyclerView.NO_POSITION) {
+                    OrganizationDto item = organizationList.get(position);
+                    listener.onItemClick(item);
+                }
             }
         }
     }

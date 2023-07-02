@@ -108,9 +108,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         public void onClick(View view) {
             if (listener != null) {
                 int position = getAdapterPosition();
-                TaskDto taskDto = taskList.get(position);
-                Log.i(TAG, "onClick: " + position);
-                listener.onItemClick(taskDto);
+                if (position > RecyclerView.NO_POSITION) {
+                    TaskDto taskDto = taskList.get(position);
+                    listener.onItemClick(taskDto);
+                }
             }
         }
 
@@ -118,9 +119,11 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         public boolean onLongClick(View view) {
             if (longListener != null) {
                 int position = getAdapterPosition();
-                TaskDto taskDto = taskList.get(position);
-                Log.i(TAG, "onLongClick: " + position);
-                longListener.onItemLongClick(taskDto, position);
+                if (position > RecyclerView.NO_POSITION) {
+                    TaskDto taskDto = taskList.get(position);
+                    longListener.onItemLongClick(taskDto, position);
+                }
+
             }
             return true;
         }

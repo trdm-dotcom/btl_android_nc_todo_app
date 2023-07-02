@@ -21,7 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class TaskOptionsFragment extends BottomSheetDialogFragment {
     private HttpClientHelper httpClientHelper;
-    private AppCompatButton btnEdit, btnCompleted, btnDelete, btnClose;
+    private AppCompatButton btnEdit, btnCompleted, btnDelete, btnClose, btnAssignees;
     private setRefreshListener setRefreshListener;
     private long taskId;
     private long organization;
@@ -43,6 +43,7 @@ public class TaskOptionsFragment extends BottomSheetDialogFragment {
         this.btnCompleted = rootView.findViewById(R.id.btn_completed);
         this.btnDelete = rootView.findViewById(R.id.btn_delete);
         this.btnClose = rootView.findViewById(R.id.btn_close);
+        this.btnAssignees = rootView.findViewById(R.id.btn_assignees);
         return rootView;
     }
 
@@ -62,6 +63,15 @@ public class TaskOptionsFragment extends BottomSheetDialogFragment {
                     }
                 }, context);
                 taskFormFragment.show(getFragmentManager(), taskFormFragment.getTag());
+            }
+        });
+        this.btnAssignees.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
+                FindUserFragment findUserFragment = new FindUserFragment();
+                findUserFragment.setId(null, taskId, context);
+                findUserFragment.show(getFragmentManager(), findUserFragment.getTag());
             }
         });
         this.btnCompleted.setOnClickListener(new View.OnClickListener() {

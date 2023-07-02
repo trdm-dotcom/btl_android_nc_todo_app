@@ -14,9 +14,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15dp"
+
         app:layout_constraintBottom_toBottomOf="@+id/userLayout_username"
         app:layout_constraintTop_toBottomOf="@+id/userLayout_username">
+
+        <TextView
+            android:id="@+id/userLayout_name"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:gravity="center_vertical"
+            android:textSize="24dp"
+            app:layout_constraintStart_toEndOf="@+id/imageView3"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/userLayout_email"
@@ -31,17 +42,6 @@
             app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toBottomOf="@+id/userLayout_name"
             app:layout_constraintVertical_bias="0.0"/>
-
-        <TextView
-            android:id="@+id/userLayout_name"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginLeft="12dp"
-            android:gravity="center_vertical"
-            android:textSize="24dp"
-            app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
             android:id="@+id/imageView3"
