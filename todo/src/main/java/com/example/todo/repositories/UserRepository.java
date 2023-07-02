@@ -18,4 +18,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("FROM User WHERE id in (:ids)")
     Set<User> findByIdIn(Collection<Long> ids);
+    @Query("SELECT user FROM User user JOIN user.organizations organization WHERE organization.id = :id")
+    Set<User> findByOrganizationId(Long id);
+    @Query("FROM User WHERE id NOT IN (SELECT user.id FROM User user JOIN user.organizations organization WHERE organization.id = :id)")
+    Set<User> findByOrganizationIdNot(Long id);
+    @Query("SELECT user FROM Task task JOIN task.assignees user WHERE task.id = :id")
+    Set<User> findByTaskId(Long id);
+    @Query("FROM User WHERE id NOT IN (SELECT user.id FROM Task task JOIN task.assignees user WHERE task.id = :id)")
+    Set<User> findByTaskIdNot(Long id);
 }

@@ -34,10 +34,9 @@ public class UserController {
             return ResponseEntity.ok(this.userService.getUser(dataRequest.getUserData().getId()));
         } catch (Exception e) {
             log.error("Error: ", e);
-            if(e instanceof GeneralException) {
+            if (e instanceof GeneralException) {
                 return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
-            }
-            else {
+            } else {
                 return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
         }
@@ -49,10 +48,9 @@ public class UserController {
             return ResponseEntity.ok(this.userService.getUser(id));
         } catch (Exception e) {
             log.error("Error: ", e);
-            if(e instanceof GeneralException) {
+            if (e instanceof GeneralException) {
                 return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
-            }
-            else {
+            } else {
                 return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
         }
@@ -65,10 +63,9 @@ public class UserController {
             return ResponseEntity.ok(this.userService.updateUser(dataRequest, userRequest));
         } catch (Exception e) {
             log.error("Error: ", e);
-            if(e instanceof GeneralException) {
+            if (e instanceof GeneralException) {
                 return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
-            }
-            else {
+            } else {
                 return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
         }
@@ -81,10 +78,9 @@ public class UserController {
             return ResponseEntity.ok(this.userService.confirm(dataRequest, confirmRequest));
         } catch (Exception e) {
             log.error("Error: ", e);
-            if(e instanceof GeneralException) {
+            if (e instanceof GeneralException) {
                 return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
-            }
-            else {
+            } else {
                 return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
         }
@@ -97,10 +93,9 @@ public class UserController {
             return ResponseEntity.ok(this.userService.changePassword(dataRequest, passwordRequest));
         } catch (Exception e) {
             log.error("Error: ", e);
-            if(e instanceof GeneralException) {
+            if (e instanceof GeneralException) {
                 return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
-            }
-            else {
+            } else {
                 return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
         }
@@ -113,10 +108,26 @@ public class UserController {
             return ResponseEntity.ok(this.userService.findUser(dataRequest, search));
         } catch (Exception e) {
             log.error("Error: ", e);
-            if(e instanceof GeneralException) {
+            if (e instanceof GeneralException) {
                 return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
+                return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
-            else {
+        }
+    }
+
+    @GetMapping("/find-all")
+    public ResponseEntity<Object> findAllUser(HttpServletRequest request,
+                                              @RequestParam(value = "organization", required = false) Long organizationId,
+                                              @RequestParam(value = "task", required = false) Long taskId) {
+        try {
+            DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);
+            return ResponseEntity.ok(this.userService.findAllUser(dataRequest, organizationId, taskId));
+        } catch (Exception e) {
+            log.error("Error: ", e);
+            if (e instanceof GeneralException) {
+                return ResponseEntity.badRequest().body(new Status(((GeneralException) e).getCode(), ((GeneralException) e).getMessageParams()));
+            } else {
                 return ResponseEntity.badRequest().body(new Status(INTERNAL_SERVER_ERROR.name(), new ArrayList<>()));
             }
         }

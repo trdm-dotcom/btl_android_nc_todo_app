@@ -4,12 +4,10 @@ import com.example.todo.constants.enums.Priority;
 import com.example.todo.models.dto.TaskDto;
 import com.example.todo.models.request.*;
 import com.example.todo.models.response.AuthenticationResponse;
+import com.example.todo.models.response.ListUserResponse;
 import com.example.todo.models.response.RefreshTokenResponse;
 import com.example.todo.security.JwtUtilities;
-import com.example.todo.servies.AuthenticationService;
-import com.example.todo.servies.OrganizationService;
-import com.example.todo.servies.TaskService;
-import com.example.todo.servies.TokenService;
+import com.example.todo.servies.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +36,15 @@ class TodoApplicationTests {
 	JwtUtilities jwtUtilities;
 	@Autowired
 	TaskService taskService;
-	static final String rf = "d8b47936-cd1e-4e0e-8d01-7125650611e2";
+	@Autowired
+	UserService userService;
+	static final String rf = "3dc89fee-7160-48f9-80cd-4717beab8f94";
 
 	@Test
 	public void testRegister() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
 		RegisterRequest request = new RegisterRequest();
-		request.setEmail("tranfminh@gamil.com");
-		request.setName("huy");
+		request.setEmail("tranfminh.3@gmail.com");
+		request.setName("test");
 		request.setPassword("P@ssW0$d");
 		authenticationService.register(request);
 	}
@@ -75,7 +75,7 @@ class TodoApplicationTests {
 		String acc = response.getAccessToken();
 		DataRequest dataRequest =  jwtUtilities.getDataRequest(acc);
 		OrganizationMemberRequest request = new OrganizationMemberRequest();
-		request.setOrganizationId(1L);
+		request.setOrganizationId(4L);
 		request.setUserId(2L);
 		organizationService.addMember(dataRequest, request);
 	}
@@ -123,5 +123,11 @@ class TodoApplicationTests {
 		DataRequest dataRequest =  jwtUtilities.getDataRequest(acc);
 		Set<TaskDto> set = taskService.findTaskBy(dataRequest, 100, 0, "20230630", "20230707", null, null, 1L);
 		System.out.println(set);
+	}
+
+	@Test
+	public void testFindAllUser() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		ListUserResponse response = userService.findAllUser(1L, null);
+		System.out.println(response);
 	}
 }

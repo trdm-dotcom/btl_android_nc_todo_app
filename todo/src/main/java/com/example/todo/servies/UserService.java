@@ -9,6 +9,7 @@ import com.example.todo.models.request.ConfirmRequest;
 import com.example.todo.models.request.DataRequest;
 import com.example.todo.models.request.UpdatePasswordRequest;
 import com.example.todo.models.request.UserRequest;
+import com.example.todo.models.response.ListUserResponse;
 import com.example.todo.repositories.UserRepository;
 import com.example.todo.utils.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,5 +93,35 @@ public class UserService {
                 .filter(user -> user.getId() != request.getUserData().getId())
                 .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
                 .collect(Collectors.toSet());
+    }
+
+    public ListUserResponse findAllUser(DataRequest dataRequest, Long taskId, Long organizationId) {
+        ListUserResponse response = new ListUserResponse();
+        if (taskId != null) {
+            response.setChooseUser(this.userRepository.findByTaskId(taskId)
+                    .stream()
+                    .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
+                    .collect(Collectors.toSet()));
+            response.setListUser(this.userRepository.findByTaskIdNot(taskId)
+                    .stream()
+                    .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
+                    .collect(Collectors.toSet()));
+        } else if (organizationId != null) {
+            response.setChooseUser(this.userRepository.findByOrganizationId(organizationId)
+                    .stream()
+                    .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
+                    .collect(Collectors.toSet()));
+            response.setListUser(this.userRepository.findByOrganizationIdNot(organizationId)
+                    .stream()
+                    .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
+                    .collect(Collectors.toSet()));
+        } else {
+            response.setListUser(this.userRepository.findAll()
+                    .stream()
+                    .filter(user -> user.getId() != dataRequest.getUserData().getId())
+                    .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
+                    .collect(Collectors.toSet()));
+        }
+        return response;
     }
 }
