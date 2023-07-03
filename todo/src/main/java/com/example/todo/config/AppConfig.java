@@ -24,10 +24,13 @@ public class AppConfig {
 
     @Data
     public static class Mail {
-        private String sender;
-        private String smtpUsername;
-        private String smtpPassword;
         private String endpoint;
         private int port;
+        private String username;
+        private String smtpUsername;
+        private String smtpPassword;
+        private String sender;
+        private String support;
+        private String subject;
     }
 }

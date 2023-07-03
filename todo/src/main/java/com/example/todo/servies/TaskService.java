@@ -23,16 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -173,22 +171,34 @@ public class TaskService {
         return new HashMap<>();
     }
 
+    @Transactional
     public Object assigneeTask(DataRequest dataRequest, AssigneeRequest request) {
         request.validate();
-        User user = this.userRepository.findById(request.getAssignee()).orElseThrow(() -> new GeneralException(Constants.USER_NOT_FOUND));
+        Set<User> users = this.userRepository.findByIdIn(request.getAssignee());
         Task task = this.taskRepository.findById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));
-        if (!user.getOrganizations().contains(task.getOrganization())) {
-            throw new GeneralException(Constants.USER_NOT_IN_ORGANIZATION);
+        if (CollectionUtils.isEmpty(users)) {
+            throw new GeneralException(Constants.USER_NOT_FOUND);
         }
         Set<Long> assignees = task.getAssignees().stream().map(User::getId).collect(Collectors.toSet());
         if (!assignees.contains(dataRequest.getUserData().getId())) {
             throw new GeneralException(Constants.NOT_PERMISSION);
         }
-        if (assignees.contains(request.getAssignee())) {
+        if (users.containsAll(task.getAssignees())) {
             throw new GeneralException(Constants.ALREADY_ASSIGNED);
         }
-        task.getAssignees().add(user);
-        this.taskRepository.save(task);
+        users = users.stream().filter(user -> !task.getAssignees().contains(user) && user.getOrganizations().contains(task.getOrganization()))
+                .collect(Collectors.toSet());
+        task.getAssignees().addAll(users);
+//        this.taskRepository.save(task);
+        try {
+            Map<String, Object> data = new HashMap<String, Object>() {{
+                put("name", dataRequest.getUserData().getName());
+                put("task", task.getTitle());
+            }};
+            sendEmailService.sendMail(String.format("You have been assigned to task %s", task.getTitle()), users.stream().map(User::getEmail).collect(Collectors.toList()), "assignee_task", data, Locale.ENGLISH.getLanguage());
+        } catch (Exception e) {
+            log.error("Error when send email", e);
+        }
         return new HashMap<>();
     }
 
