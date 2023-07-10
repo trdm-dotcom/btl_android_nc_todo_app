@@ -1,14 +1,15 @@
 package com.example.todo.model.request;
 
+import java.util.List;
+
 public class AssigneeRequest {
     private Long task;
-    private Long assignee;
+    private List<Long> assignee;
 
     public AssigneeRequest() {
-
     }
 
-    public AssigneeRequest(Long task, Long assignee) {
+    public AssigneeRequest(Long task, List<Long> assignee) {
         this.task = task;
         this.assignee = assignee;
     }
@@ -21,11 +22,11 @@ public class AssigneeRequest {
         this.task = task;
     }
 
-    public Long getAssignee() {
+    public List<Long> getAssignee() {
         return assignee;
     }
 
-    public void setAssignee(Long assignee) {
+    public void setAssignee(List<Long> assignee) {
         this.assignee = assignee;
     }
 }

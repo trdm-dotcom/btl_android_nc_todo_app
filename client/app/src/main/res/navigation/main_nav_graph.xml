@@ -70,5 +70,22 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/mainTaskPageFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainTaskPageFragment_to_taskDetailsFragment"
+            app:destination="@id/taskDetailsFragment"
+            app:popUpTo="@id/mainTaskPageFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/taskDetailsFragment"
+        android:name="com.example.todo.fragments.TaskDetailFragment"
+        android:label="task_detail_fragment"
+        tools:layout="@layout/fragment_task_detail">
+        <action
+            android:id="@+id/action_taskDetailsFragment_to_mainTaskPageFragment"
+            app:destination="@id/mainTaskPageFragment"
+            app:popUpTo="@id/taskDetailsFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 </navigation>

@@ -1,14 +1,16 @@
 package com.example.todo.model.request;
 
+import java.util.List;
+
 public class OrganizationMemberRequest {
     private Long organizationId;
-    private Long userId;
+    private List<Long> userId;
 
     public OrganizationMemberRequest() {
 
     }
 
-    public OrganizationMemberRequest(Long organizationId, Long userId) {
+    public OrganizationMemberRequest(Long organizationId, List<Long> userId) {
         this.organizationId = organizationId;
         this.userId = userId;
     }
@@ -21,11 +23,11 @@ public class OrganizationMemberRequest {
         this.organizationId = organizationId;
     }
 
-    public Long getUserId() {
+    public List<Long> getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(List<Long> userId) {
         this.userId = userId;
     }
 }

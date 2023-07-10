@@ -121,6 +121,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 int position = getAdapterPosition();
                 if (position > RecyclerView.NO_POSITION) {
                     TaskDto taskDto = taskList.get(position);
+                    Log.i(TAG, "onLongClick: " + taskDto.getStatus());
+                    if(taskDto.getStatus().equals("DONE")){
+                        return false;
+                    }
                     longListener.onItemLongClick(taskDto, position);
                 }
 

@@ -12,8 +12,6 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import com.example.todo.R;
 import com.example.todo.common.GeneralException;
@@ -21,6 +19,12 @@ import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.OrganizationDto;
 import com.example.todo.model.request.OrganizationRequest;
 import com.example.todo.utils.HttpClientHelper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -33,14 +37,17 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
     private long orgId;
     private boolean isEdit;
     private Context context;
+    private ObjectMapper objectMapper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.httpClientHelper = HttpClientHelper.getInstance(getActivity());
-        if (getArguments() != null) {
-            getOrganization(getArguments().getLong("id"));
-        }
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
     }
 
     @Nullable
@@ -90,7 +97,7 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
                             body,
                             Object.class);
                     return null;
-                } catch (GeneralException e) {
+                } catch (Exception e) {
                     Log.e(TAG, "error: ", e);
                     if (e instanceof GeneralException) {
                         return ((GeneralException) e).getCode();
@@ -144,7 +151,8 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
                 super.onPostExecute(result);
                 mProgressDialog.dismiss();
                 if (result instanceof OrganizationDto) {
-                    orgNameEdt.setText(((OrganizationDto) result).getName());
+                    OrganizationDto organizationDto = objectMapper.convertValue(result, OrganizationDto.class);
+                    orgNameEdt.setText(organizationDto.getName());
                 } else {
                     CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 }

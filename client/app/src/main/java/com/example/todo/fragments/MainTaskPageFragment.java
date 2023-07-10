@@ -24,7 +24,13 @@ import com.example.todo.common.GeneralException;
 import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.TaskDto;
 import com.example.todo.utils.HttpClientHelper;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 
@@ -49,6 +55,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     private MaterialDatePicker materialDatePicker;
     private Date startDate, endDate;
+    private ObjectMapper objectMapper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +68,11 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
         this.startDate = calendar.getTime();
         calendar.add(Calendar.DAY_OF_MONTH, 7);
         this.endDate = calendar.getTime();
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
     }
 
     @Nullable
@@ -71,6 +83,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
         this.taskRecycler = rootView.findViewById(R.id.mainRecyclerView);
         this.addTask = rootView.findViewById(R.id.addTask);
         this.back = rootView.findViewById(R.id.back);
+        this.setUpAdapter();
         this.getSavedTasks(this.startDate, this.endDate);
         return rootView;
     }
@@ -130,6 +143,9 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
         this.taskAdapter.setOnItemClickListener(new TaskAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(TaskDto item) {
+                Bundle bundle = new Bundle();
+                bundle.putLong("task", item.getId());
+                navController.navigate(R.id.action_mainTaskPageFragment_to_taskDetailsFragment, bundle);
             }
         });
         this.taskAdapter.setOnItemLongClickListener(new TaskAdapter.OnItemLongClickListener() {
@@ -145,7 +161,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
                 taskOptionsFragment.show(getFragmentManager(), taskOptionsFragment.getTag());
             }
         });
-        this.taskRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
+        this.taskRecycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         this.taskRecycler.setAdapter(this.taskAdapter);
     }
 
@@ -186,9 +202,10 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
                 if (result instanceof String) {
                     CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 } else {
-                    tasks = (List<TaskDto>) result;
+                    tasks = objectMapper.convertValue(result, new TypeReference<List<TaskDto>>() {
+                    });
+                    setUpAdapter();
                 }
-                setUpAdapter();
             }
         }
         GetSavedTasks savedTasks = new GetSavedTasks();

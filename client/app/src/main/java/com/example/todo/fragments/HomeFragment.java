@@ -1,6 +1,5 @@
 package com.example.todo.fragments;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +22,13 @@ import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.OrganizationDto;
 import com.example.todo.model.dto.UserData;
 import com.example.todo.utils.HttpClientHelper;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -38,11 +43,17 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
     private TextView name;
     private static final String TAG = HomeFragment.class.getSimpleName();
     private FloatingActionButton btnAdd;
+    private ObjectMapper objectMapper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.httpClientHelper = HttpClientHelper.getInstance(getActivity());
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
     }
 
     @Nullable
@@ -52,6 +63,7 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
         this.taskRecycler = rootView.findViewById(R.id.mainRecyclerView);
         this.name = rootView.findViewById(R.id.name);
         this.btnAdd = rootView.findViewById(R.id.addOrg);
+        this.setUpAdapter();
         this.getUserInfo();
         this.getSavedOrganizations();
         return rootView;
@@ -120,9 +132,10 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
                 if (result instanceof String) {
                     CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 } else {
-                    list = (List<OrganizationDto>) result;
+                    list = objectMapper.convertValue(result, new TypeReference<List<OrganizationDto>>() {
+                    });
+                    setUpAdapter();
                 }
-                setUpAdapter();
             }
         }
         GetSavedOrganizations getSavedOrganizations = new GetSavedOrganizations();
@@ -152,7 +165,8 @@ public class HomeFragment extends Fragment implements OrganizationFormFragment.s
                 if (result instanceof String) {
                     CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 } else {
-                    name.setText(((UserData) result).getName());
+                    UserData userData = objectMapper.convertValue(result, UserData.class);
+                    name.setText(userData.getName());
                 }
             }
         }

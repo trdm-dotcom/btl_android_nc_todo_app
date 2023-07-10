@@ -23,6 +23,12 @@ import com.example.todo.model.dto.UserData;
 import com.example.todo.model.request.LoginRequest;
 import com.example.todo.model.response.AuthenticationResponse;
 import com.example.todo.utils.HttpClientHelper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class SignInFragment extends Fragment {
@@ -32,11 +38,17 @@ public class SignInFragment extends Fragment {
     private TextInputEditText mailEdt, passEdt;
     private HttpClientHelper httpClientHelper;
     private static final String TAG = SignInFragment.class.getSimpleName();
+    private ObjectMapper objectMapper;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.httpClientHelper = HttpClientHelper.getInstance(getActivity());
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
     }
 
     @Nullable
@@ -104,7 +116,7 @@ public class SignInFragment extends Fragment {
                 super.onPostExecute(o);
                 mProgressDialog.dismiss();
                 if (o instanceof AuthenticationResponse) {
-                    AuthenticationResponse response = (AuthenticationResponse) o;
+                    AuthenticationResponse response = objectMapper.convertValue(o, AuthenticationResponse.class);
                     httpClientHelper.setAccessToken(response.getAccessToken());
                     httpClientHelper.setRefreshToken(response.getRefreshToken());
                     UserData userData = response.getUserData();

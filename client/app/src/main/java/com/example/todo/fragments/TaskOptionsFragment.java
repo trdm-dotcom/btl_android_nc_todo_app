@@ -70,7 +70,7 @@ public class TaskOptionsFragment extends BottomSheetDialogFragment {
             public void onClick(View view) {
                 dismiss();
                 FindUserFragment findUserFragment = new FindUserFragment();
-                findUserFragment.setId(null, taskId, context);
+                findUserFragment.setId(organization, taskId);
                 findUserFragment.show(getFragmentManager(), findUserFragment.getTag());
             }
         });

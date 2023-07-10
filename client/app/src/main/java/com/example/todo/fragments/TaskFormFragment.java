@@ -25,6 +25,12 @@ import com.example.todo.model.dto.OrganizationDto;
 import com.example.todo.model.dto.TaskDto;
 import com.example.todo.model.request.TaskRequest;
 import com.example.todo.utils.HttpClientHelper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -46,14 +52,17 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
     private boolean isEdit;
     private Context context;
     private long organization;
+    private ObjectMapper objectMapper;
 
     @Override
     public void onCreate(@org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.httpClientHelper = HttpClientHelper.getInstance(this.context);
-        if (getArguments() != null) {
-            getTask(getArguments().getLong("id"));
-        }
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
     }
 
     @Nullable
@@ -171,7 +180,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
                             body,
                             Object.class);
                     return null;
-                } catch (GeneralException e) {
+                } catch (Exception e) {
                     Log.e(TAG, "error: ", e);
                     if (e instanceof GeneralException) {
                         return ((GeneralException) e).getCode();
@@ -212,8 +221,12 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
                     return httpClientHelper.get(
                             httpClientHelper.buildUrl(String.format("task/%d", ids), null),
                             OrganizationDto.class);
-                } catch (GeneralException e) {
-                    return e.getMessage();
+                } catch (Exception e) {
+                    Log.e(TAG, "error: ", e);
+                    if (e instanceof GeneralException) {
+                        return ((GeneralException) e).getCode();
+                    }
+                    return "ERROR";
                 }
             }
 
@@ -222,13 +235,14 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
                 super.onPostExecute(result);
                 mProgressDialog.dismiss();
                 if (result instanceof TaskDto) {
-                    taskTitleEdt.setText(((TaskDto) result).getTitle());
-                    taskDesEdt.setText(((TaskDto) result).getDescription());
-                    taskReminderSw.setChecked(((TaskDto) result).getReminder());
-                    taskStartEdt.setText(dateFormat.format(((TaskDto) result).getStartDate()));
-                    taskEndEdt.setText(dateFormat.format(((TaskDto) result).getEndDate()));
-                    calendarStart.setTime(((TaskDto) result).getStartDate());
-                    calendarEnd.setTime(((TaskDto) result).getEndDate());
+                    TaskDto taskDto = objectMapper.convertValue(result, TaskDto.class);
+                    taskTitleEdt.setText(taskDto.getTitle());
+                    taskDesEdt.setText(taskDto.getDescription());
+                    taskReminderSw.setChecked(taskDto.getReminder());
+                    taskStartEdt.setText(dateFormat.format(taskDto.getStartDate()));
+                    taskEndEdt.setText(dateFormat.format(taskDto.getEndDate()));
+                    calendarStart.setTime(taskDto.getStartDate());
+                    calendarEnd.setTime(taskDto.getEndDate());
                 } else {
                     CustomToast.makeText(context, result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
                 }
