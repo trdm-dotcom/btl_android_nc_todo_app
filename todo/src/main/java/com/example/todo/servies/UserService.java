@@ -97,16 +97,16 @@ public class UserService {
 
     public ListUserResponse findAllUser(DataRequest dataRequest, Long taskId, Long organizationId) {
         ListUserResponse response = new ListUserResponse();
-        if (taskId != null) {
+        if (taskId != null && organizationId != null) {
             response.setChooseUser(this.userRepository.findByTaskId(taskId)
                     .stream()
                     .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
                     .collect(Collectors.toSet()));
-            response.setListUser(this.userRepository.findByTaskIdNot(taskId)
+            response.setListUser(this.userRepository.findByTaskIdNot(taskId, organizationId)
                     .stream()
                     .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
                     .collect(Collectors.toSet()));
-        } else if (organizationId != null) {
+        } else if (taskId == null && organizationId != null) {
             response.setChooseUser(this.userRepository.findByOrganizationId(organizationId)
                     .stream()
                     .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))

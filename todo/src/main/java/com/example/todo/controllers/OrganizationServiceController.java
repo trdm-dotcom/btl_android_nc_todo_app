@@ -71,7 +71,7 @@ public class OrganizationServiceController {
         }
     }
 
-    @DeleteMapping("/member")
+    @PutMapping("/member/remove")
     public ResponseEntity<Object> removeMember(HttpServletRequest request, @RequestBody OrganizationMemberRequest organizationRequest) {
         try {
             DataRequest dataRequest = this.objectMapper.convertValue(request.getAttribute("dataRequest"), DataRequest.class);

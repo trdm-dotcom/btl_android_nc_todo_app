@@ -189,16 +189,10 @@ public class TaskService {
         users = users.stream().filter(user -> !task.getAssignees().contains(user) && user.getOrganizations().contains(task.getOrganization()))
                 .collect(Collectors.toSet());
         task.getAssignees().addAll(users);
-//        this.taskRepository.save(task);
-        try {
-            Map<String, Object> data = new HashMap<String, Object>() {{
-                put("name", dataRequest.getUserData().getName());
-                put("task", task.getTitle());
-            }};
-            sendEmailService.sendMail(String.format("You have been assigned to task %s", task.getTitle()), users.stream().map(User::getEmail).collect(Collectors.toList()), "assignee_task", data, Locale.ENGLISH.getLanguage());
-        } catch (Exception e) {
-            log.error("Error when send email", e);
-        }
+        this.taskRepository.save(task);
+        this.sendEmailAssigneeTask(dataRequest.getUserData().getName(),
+                task.getTitle(),
+                users);
         return new HashMap<>();
     }
 
@@ -219,5 +213,21 @@ public class TaskService {
         comment.setTask(task);
         this.commentRepository.save(comment);
         return new HashMap<>();
+    }
+
+    private void sendEmailAssigneeTask(String name, String title, Set<User> users) {
+        try {
+            Map<String, Object> data = new HashMap<String, Object>() {{
+                put("name", name);
+                put("task", title);
+            }};
+            sendEmailService.sendMail(String.format("You have been assigned to task %s", title),
+                    users.stream().map(User::getEmail).collect(Collectors.toList()),
+                    "assignee_task",
+                    data,
+                    Locale.ENGLISH.getLanguage());
+        } catch (Exception e) {
+            log.error("Error when send email", e);
+        }
     }
 }
