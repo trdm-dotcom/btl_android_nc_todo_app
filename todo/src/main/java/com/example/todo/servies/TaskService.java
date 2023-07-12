@@ -219,7 +219,9 @@ public class TaskService {
         comment.setContent(request.getContent());
         comment.setUser(currentUser);
         comment.setTask(task);
-        this.commentRepository.save(comment);
+        comment = this.commentRepository.save(comment);
+        task.getComments().add(comment);
+        this.taskRepository.save(task);
         return new HashMap<>();
     }
 

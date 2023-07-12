@@ -48,7 +48,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                 if (status != null) {
                     predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("status"), status)));
                 }
-                root.fetch("assignees");
                 root.fetch("comments", JoinType.LEFT);
                 query.orderBy(criteriaBuilder.asc(root.get("startDate")));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -59,6 +58,6 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     @Query("SELECT t FROM Task t JOIN FETCH t.comments WHERE remind IS true AND endDate >= :date AND startDate <= :date")
     Set<Task> findByRemindTrueAndDate(LocalDate date);
 
-    @Query("SELECT t FROM Task t JOIN FETCH t.assignees LEFT JOIN FETCH t.comments WHERE t.id = :id")
+    @Query("SELECT t FROM Task t JOIN FETCH t.comments WHERE t.id = :id")
     Optional<Task> findOneById(Long id);
 }
