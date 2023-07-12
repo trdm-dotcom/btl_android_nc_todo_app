@@ -7,6 +7,7 @@ import com.example.todo.constants.enums.TaskStatus;
 import com.example.todo.models.db.Comment;
 import com.example.todo.models.db.Task;
 import com.example.todo.models.db.User;
+import com.example.todo.models.dto.CommentDto;
 import com.example.todo.models.dto.OrganizationDto;
 import com.example.todo.models.dto.TaskDto;
 import com.example.todo.models.dto.UserData;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -87,7 +89,7 @@ public class TaskService {
 
     public Object updateTask(DataRequest dataRequest, Long id, TaskRequest request) {
         request.validate();
-        Task task = this.taskRepository.findById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
+        Task task = this.taskRepository.findOneById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
         Set<Long> assignees = task.getAssignees().stream().map(User::getId).collect(Collectors.toSet());
         if (!assignees.contains(dataRequest.getUserData().getId())) {
             throw new GeneralException(Constants.NOT_PERMISSION);
@@ -112,7 +114,7 @@ public class TaskService {
     }
 
     public Object deleteTask(DataRequest dataRequest, Long id) {
-        Task task = this.taskRepository.findById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
+        Task task = this.taskRepository.findOneById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
         Set<Long> assignees = task.getAssignees().stream().map(User::getId).collect(Collectors.toSet());
         if (!assignees.contains(dataRequest.getUserData().getId())) {
             throw new GeneralException(Constants.NOT_PERMISSION);
@@ -137,14 +139,17 @@ public class TaskService {
                                 task.getAssignees().stream()
                                         .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
                                         .collect(Collectors.toSet()),
-                                new OrganizationDto(task.getOrganization().getId(), task.getOrganization().getName(), null, null, null)
+                                new OrganizationDto(task.getOrganization().getId(), task.getOrganization().getName(), null, null, null),
+                                task.getComments().stream()
+                                        .map(comment -> new CommentDto(comment.getId(), comment.getContent(), comment.getCreatedAt(), comment.getUser().getName()))
+                                        .collect(Collectors.toSet())
                         )
                 )
                 .collect(Collectors.toSet());
     }
 
     public TaskDto findTaskById(Long id) {
-        Task task = this.taskRepository.findById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
+        Task task = this.taskRepository.findOneById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
         return new TaskDto(task.getId(),
                 task.getTitle(),
                 task.getDescription(),
@@ -156,12 +161,15 @@ public class TaskService {
                 task.getAssignees().stream()
                         .map(user -> new UserData(user.getId(), user.getName(), user.getEmail(), user.getStatus()))
                         .collect(Collectors.toSet()),
-                new OrganizationDto(task.getOrganization().getId(), task.getOrganization().getName(), null, null, null)
+                new OrganizationDto(task.getOrganization().getId(), task.getOrganization().getName(), null, null, null),
+                task.getComments().stream()
+                        .map(comment -> new CommentDto(comment.getId(), comment.getContent(), comment.getCreatedAt(), comment.getUser().getName()))
+                        .collect(Collectors.toSet())
         );
     }
 
     public Object updateTaskStatus(DataRequest dataRequest, Long id, TaskStatus status) {
-        Task task = this.taskRepository.findById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
+        Task task = this.taskRepository.findOneById(id).orElseThrow(() -> new GeneralException(Constants.OBJECT_NOT_FOUND));
         Set<Long> assignees = task.getAssignees().stream().map(User::getId).collect(Collectors.toSet());
         if (!assignees.contains(dataRequest.getUserData().getId())) {
             throw new GeneralException(Constants.NOT_PERMISSION);
@@ -175,7 +183,7 @@ public class TaskService {
     public Object assigneeTask(DataRequest dataRequest, AssigneeRequest request) {
         request.validate();
         Set<User> users = this.userRepository.findByIdIn(request.getAssignee());
-        Task task = this.taskRepository.findById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));
+        Task task = this.taskRepository.findOneById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));
         if (CollectionUtils.isEmpty(users)) {
             throw new GeneralException(Constants.USER_NOT_FOUND);
         }
@@ -206,7 +214,7 @@ public class TaskService {
         } else {
             currentUser = this.userRepository.findById(dataRequest.getUserData().getId()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
         }
-        Task task = this.taskRepository.findById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));
+        Task task = this.taskRepository.findOneById(request.getTask()).orElseThrow(() -> new GeneralException(Constants.INVALID_TASK));
         Comment comment = new Comment();
         comment.setContent(request.getContent());
         comment.setUser(currentUser);

@@ -23,4 +23,5 @@ public class TaskDto {
     private Priority priority;
     private Set<UserData> assignees;
     private OrganizationDto organization;
+    private Set<CommentDto> comments;
 }

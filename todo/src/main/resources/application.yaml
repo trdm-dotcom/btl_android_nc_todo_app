@@ -2,7 +2,7 @@ spring:
   application:
     name: todo
   jpa:
-    show-sql: true
+    show-sql: false
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
@@ -47,13 +47,13 @@ app:
   loginTemporarilyLocked: 5 #times
   loginTemporarilyLockedTime: 1800000 #30 minutes
   mail:
-    endpoint: email-smtp.us-west-2.amazonaws.com
+    endpoint: ""
     port: 587
-    username: ses-smtp-user.tradex_support
-    smtpUsername: AKIAIIZYXSIK36PQVN7Q
-    smtpPassword: AnigZiTAQ7JmeG5Az7GmEv5NgQWIc0BAJgOLfdEIsp4v
-    sender: noreply@tradex.vn
-    support: admin@tradex.vn
+    username: ""
+    smtpUsername: ""
+    smtpPassword: ""
+    sender: ""
+    support: ""
   schedulers:
     sendMail: 0 0 8 * * MON-SAT # at 08:00:00 monday to saturday
 server:

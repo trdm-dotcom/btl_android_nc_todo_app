@@ -12,15 +12,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -50,12 +48,17 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                 if (status != null) {
                     predicates.add(criteriaBuilder.and(criteriaBuilder.equal(root.get("status"), status)));
                 }
+                root.fetch("assignees");
+                root.fetch("comments", JoinType.LEFT);
                 query.orderBy(criteriaBuilder.asc(root.get("startDate")));
                 return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
             }
         }, pageable);
     }
 
-    @Query("FROM Task WHERE remind IS true AND endDate >= :date AND startDate <= :date")
+    @Query("SELECT t FROM Task t JOIN FETCH t.comments WHERE remind IS true AND endDate >= :date AND startDate <= :date")
     Set<Task> findByRemindTrueAndDate(LocalDate date);
+
+    @Query("SELECT t FROM Task t JOIN FETCH t.assignees LEFT JOIN FETCH t.comments WHERE t.id = :id")
+    Optional<Task> findOneById(Long id);
 }
