@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardUseCompatPadding="true"
     app:cardCornerRadius="27dp"
+    app:cardUseCompatPadding="true"
     app:contentPadding="10dp">
 
 
@@ -24,10 +24,11 @@
             android:layout_height="30dp"
             android:layout_marginStart="12dp"
             android:layout_marginLeft="12dp"
+            android:fontFamily="@font/inter_regular"
             android:gravity="center_vertical"
             android:textSize="24dp"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/userLayout_email"
@@ -36,12 +37,13 @@
             android:layout_marginStart="12dp"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter_regular"
             android:gravity="center_vertical"
             android:textSize="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
             app:layout_constraintTop_toBottomOf="@+id/userLayout_name"
-            app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintVertical_bias="0.0" />
 
         <ImageView
             android:id="@+id/imageView3"

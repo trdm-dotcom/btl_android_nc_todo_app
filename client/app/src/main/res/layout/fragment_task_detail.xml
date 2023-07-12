@@ -7,9 +7,9 @@
     tools:context=".fragments.TaskDetailFragment">
 
     <ImageView
-        android:id="@+id/back"
         android:layout_width="60sp"
         android:layout_height="130sp"
+        android:scaleType="fitXY"
         android:src="@drawable/ellipse_one"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +37,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/detailBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_back" />
@@ -50,13 +51,18 @@
             android:orientation="horizontal"
             android:paddingVertical="10dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/tag"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="5dp" />
+                android:background="@drawable/circle_background"
+                android:padding="11dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/tag" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -88,13 +94,18 @@
             android:orientation="horizontal"
             android:paddingVertical="10dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/note"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="5dp" />
+                android:background="@drawable/circle_background"
+                android:padding="11dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/note" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -126,13 +137,18 @@
             android:orientation="horizontal"
             android:paddingVertical="10dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/calendar"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="5dp" />
+                android:background="@drawable/circle_background"
+                android:padding="11dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/calendar" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -164,13 +180,18 @@
             android:orientation="horizontal"
             android:paddingVertical="10dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/priority"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="5dp" />
+                android:background="@drawable/circle_background"
+                android:padding="11dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/priority" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -201,13 +222,18 @@
             android:orientation="horizontal"
             android:paddingVertical="10dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/group"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="5dp" />
+                android:background="@drawable/circle_background"
+                android:padding="11dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/group" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -229,5 +255,48 @@
             </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comment:"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:fontFamily="@font/inter_semi_bold">
+        </TextView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edtContentMessage"
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/imgSend"
+                android:background="@drawable/edit_text_round_corner"
+                android:paddingLeft="20dp"
+                android:textColorHint="@color/black"
+                android:textSize="14dp" />
+
+            <ImageView
+                android:id="@+id/imgSend"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="20dp"
+                android:src="@drawable/ic_paper_plane_top" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/lvComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

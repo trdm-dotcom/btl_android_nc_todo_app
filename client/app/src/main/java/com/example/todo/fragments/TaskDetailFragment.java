@@ -2,10 +2,13 @@ package com.example.todo.fragments;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,9 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todo.R;
+import com.example.todo.adapter.ChooseUserAdapter;
+import com.example.todo.adapter.CommentAdapter;
 import com.example.todo.custom.CustomToast;
+import com.example.todo.model.dto.CommentDto;
 import com.example.todo.model.dto.TaskDto;
 import com.example.todo.model.dto.UserData;
+import com.example.todo.model.request.CommentRequest;
 import com.example.todo.utils.HttpClientHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -30,18 +37,24 @@ import com.fasterxml.jackson.databind.type.LogicalType;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TaskDetailFragment extends Fragment {
     private NavController navController;
     private TextView tvTaskTitle, tvTaskDescription, tvTaskDate, tvTaskPriority;
-    private ImageView back;
+    private ImageView back, imgSend;
     private RecyclerView rvTaskAssignee;
     private List<UserData> assignees = new ArrayList<>();
+    private List<CommentDto> comments = new ArrayList<>();
     private ChooseUserAdapter assigneeAdapter;
     private HttpClientHelper httpClientHelper;
     private ObjectMapper objectMapper;
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private ListView lvComment;
+    private EditText edtContentMessage;
+    private CommentAdapter commentAdapter;
+    private Long taskId;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +65,7 @@ public class TaskDetailFragment extends Fragment {
         this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
+        this.taskId = getArguments().getLong("task");
     }
 
     @Nullable
@@ -63,9 +77,12 @@ public class TaskDetailFragment extends Fragment {
         this.tvTaskDate = rootView.findViewById(R.id.tvTaskDate);
         this.tvTaskPriority = rootView.findViewById(R.id.tvTaskPriority);
         this.rvTaskAssignee = rootView.findViewById(R.id.rvTaskAssignee);
-        this.back = rootView.findViewById(R.id.back);
+        this.back = rootView.findViewById(R.id.detailBack);
+        this.lvComment = rootView.findViewById(R.id.lvComment);
+        this.edtContentMessage = rootView.findViewById(R.id.edtContentMessage);
+        this.imgSend = rootView.findViewById(R.id.imgSend);
         this.setUpAdapter();
-        this.getTaskDetail(getArguments().getLong("task"));
+        this.getTaskDetail(this.taskId);
         return rootView;
     }
 
@@ -76,7 +93,41 @@ public class TaskDetailFragment extends Fragment {
         this.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("TAG", "onClick: ");
                 navController.popBackStack();
+            }
+        });
+        this.imgSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String content = edtContentMessage.getText().toString().trim();
+                if (!content.isEmpty()) {
+                    class CreateComment extends AsyncTask<CommentRequest, Void, Object> {
+
+                        @Override
+                        protected Object doInBackground(CommentRequest... body) {
+                            return httpClientHelper.post(httpClientHelper.buildUrl("/task/comment", null), body[0], CommentDto.class);
+                        }
+
+                        @Override
+                        protected void onPostExecute(Object result) {
+                            super.onPostExecute(result);
+                            if (result instanceof String) {
+                                CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
+                            } else {
+                                edtContentMessage.setText("");
+                                CommentDto commentDto = new CommentDto();
+                                commentDto.setContent(content);
+                                commentDto.setCreatedAt(new Date());
+                                commentDto.setName("You");
+                                comments.add(commentDto);
+                                setUpAdapter();
+                            }
+                        }
+                    }
+                    CreateComment createComment = new CreateComment();
+                    createComment.execute(new CommentRequest(content, taskId));
+                }
             }
         });
     }
@@ -86,7 +137,7 @@ public class TaskDetailFragment extends Fragment {
 
             @Override
             protected Object doInBackground(Long... longs) {
-                return httpClientHelper.get(httpClientHelper.buildUrl(String.format("task/%d", longs[0]), null), TaskDto.class);
+                return httpClientHelper.get(httpClientHelper.buildUrl(String.format("/task/%d", longs[0]), null), TaskDto.class);
             }
 
             @Override
@@ -101,6 +152,7 @@ public class TaskDetailFragment extends Fragment {
                     tvTaskPriority.setText(taskDto.getPriority());
                     tvTaskDate.setText(String.format("%s - %s", dateFormat.format(taskDto.getStartDate()), dateFormat.format(taskDto.getEndDate())));
                     assignees = new ArrayList<>(taskDto.getAssignees());
+                    comments = new ArrayList<>(taskDto.getComments());
                     setUpAdapter();
                 }
             }
@@ -113,6 +165,9 @@ public class TaskDetailFragment extends Fragment {
         this.assigneeAdapter = new ChooseUserAdapter(getActivity(), this.assignees);
         this.rvTaskAssignee.setAdapter(this.assigneeAdapter);
         this.rvTaskAssignee.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
+
+        this.commentAdapter = new CommentAdapter(getActivity(), R.layout.item_comment, this.comments);
+        this.lvComment.setAdapter(this.commentAdapter);
     }
 
     private void init(View view) {

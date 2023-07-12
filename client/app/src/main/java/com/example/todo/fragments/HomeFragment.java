@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todo.R;
+import com.example.todo.adapter.OrganizationAdapter;
 import com.example.todo.common.GeneralException;
 import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.OrganizationDto;

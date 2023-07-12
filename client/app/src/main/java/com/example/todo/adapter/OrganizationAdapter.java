@@ -1,4 +1,4 @@
-package com.example.todo.fragments;
+package com.example.todo.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todo.R;
+import com.example.todo.fragments.OrganizationFormFragment;
 import com.example.todo.model.dto.OrganizationDto;
 
 import java.util.List;

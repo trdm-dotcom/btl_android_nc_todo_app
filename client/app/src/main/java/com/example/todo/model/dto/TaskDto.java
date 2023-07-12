@@ -28,6 +28,7 @@ public class TaskDto {
     private Boolean reminder;
     @SerializedName("organization")
     private OrganizationDto organization;
+    private Set<CommentDto> comments;
 
     public TaskDto() {
     }
@@ -131,5 +132,13 @@ public class TaskDto {
 
     public void setOrganization(OrganizationDto organization) {
         this.organization = organization;
+    }
+
+    public Set<CommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<CommentDto> comments) {
+        this.comments = comments;
     }
 }
