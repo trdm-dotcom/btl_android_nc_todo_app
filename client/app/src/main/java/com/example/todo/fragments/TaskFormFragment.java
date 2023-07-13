@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +25,9 @@ import com.example.todo.common.GeneralException;
 import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.OrganizationDto;
 import com.example.todo.model.dto.TaskDto;
+import com.example.todo.model.dto.UserData;
 import com.example.todo.model.request.TaskRequest;
+import com.example.todo.model.response.ListUserResponse;
 import com.example.todo.utils.HttpClientHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -35,24 +39,33 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TaskFormFragment extends BottomSheetDialogFragment {
     private AutoCompleteTextView autoCompleteTextView;
     private TextInputEditText taskStartEdt, taskEndEdt, taskTitleEdt, taskDesEdt;
-    private SwitchCompat taskReminderSw;
     private Calendar calendarStart, calendarEnd;
     private ImageView nextBtn;
     private HttpClientHelper httpClientHelper;
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     private setRefreshListener setRefreshListener;
     private static final String TAG = SignUpFragment.class.getSimpleName();
-    private long taskId;
+    private Long taskId;
     private boolean isEdit;
     private Context context;
-    private long organization;
+    private Long organization;
     private ObjectMapper objectMapper;
+    private List<UserData> list = new ArrayList<>();
+    private List<String> assigneeList = new ArrayList<>();
+    private ListView lvAssignees;
 
     @Override
     public void onCreate(@org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -75,16 +88,17 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         this.nextBtn = rootView.findViewById(R.id.nextBtn);
         this.taskTitleEdt = rootView.findViewById(R.id.taskTitleEdt);
         this.taskDesEdt = rootView.findViewById(R.id.taskDesEdt);
-        this.taskReminderSw = rootView.findViewById(R.id.taskReminderSw);
         this.calendarStart = Calendar.getInstance();
         this.calendarEnd = Calendar.getInstance();
         this.calendarEnd.add(Calendar.DAY_OF_MONTH, 7);
         this.taskStartEdt.setText(dateFormat.format(this.calendarStart.getTime()));
         this.taskEndEdt.setText(dateFormat.format(this.calendarEnd.getTime()));
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context,
-                android.R.layout.simple_dropdown_item_1line,
-                getResources().getStringArray(R.array.priority_dropdown_items));
-        this.autoCompleteTextView.setAdapter(adapter);
+        this.lvAssignees = rootView.findViewById(R.id.lvAssignees);
+        if (isEdit) {
+            this.getTask(taskId);
+        }
+        this.setUpAdapter();
+        this.getListUser();
         return rootView;
     }
 
@@ -145,7 +159,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         });
     }
 
-    public void setTaskId(long taskId, long organization, boolean isEdit, setRefreshListener setRefreshListener, Context context) {
+    public void setTaskId(Long taskId, Long organization, boolean isEdit, setRefreshListener setRefreshListener, Context context) {
         this.taskId = taskId;
         this.isEdit = isEdit;
         this.context = context;
@@ -166,14 +180,17 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
             @Override
             protected String doInBackground(Void... voids) {
                 SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+                SparseBooleanArray checked = lvAssignees.getCheckedItemPositions();
                 TaskRequest body = new TaskRequest();
                 body.setTitle(taskTitleEdt.getText().toString().trim());
                 body.setDescription(taskDesEdt.getText().toString().trim());
                 body.setPriority(autoCompleteTextView.getText().toString().trim());
-                body.setRemind(taskReminderSw.isChecked());
                 body.setStartDate(df.format(calendarStart.getTime()));
                 body.setEndDate(df.format(calendarEnd.getTime()));
                 body.setOrganizationId(organization);
+                body.setAssignees(IntStream.range(0, lvAssignees.getCount())
+                        .filter(i -> checked.get(i))
+                        .mapToObj(i -> list.get(i).getId()).collect(Collectors.toSet()));
                 try {
                     httpClientHelper.post(
                             httpClientHelper.buildUrl("/task", null),
@@ -219,7 +236,7 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
             protected Object doInBackground(Long... ids) {
                 try {
                     return httpClientHelper.get(
-                            httpClientHelper.buildUrl(String.format("task/%d", ids), null),
+                            httpClientHelper.buildUrl(String.format("/task/%d", ids), null),
                             OrganizationDto.class);
                 } catch (Exception e) {
                     Log.e(TAG, "error: ", e);
@@ -238,7 +255,6 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
                     TaskDto taskDto = objectMapper.convertValue(result, TaskDto.class);
                     taskTitleEdt.setText(taskDto.getTitle());
                     taskDesEdt.setText(taskDto.getDescription());
-                    taskReminderSw.setChecked(taskDto.getReminder());
                     taskStartEdt.setText(dateFormat.format(taskDto.getStartDate()));
                     taskEndEdt.setText(dateFormat.format(taskDto.getEndDate()));
                     calendarStart.setTime(taskDto.getStartDate());
@@ -250,6 +266,58 @@ public class TaskFormFragment extends BottomSheetDialogFragment {
         }
         GetTaskInBackend getTaskInBackend = new GetTaskInBackend();
         getTaskInBackend.execute(id);
+    }
+
+    private void getListUser() {
+        class GetListUser extends AsyncTask<Void, Void, Object> {
+            @Override
+            protected Object doInBackground(Void... voids) {
+                try {
+                    Map<String, Object> map = new HashMap<>();
+                    if (organization != null) {
+                        map.put("organization", organization);
+                    }
+                    if (taskId != null) {
+                        map.put("task", taskId);
+                    }
+                    return httpClientHelper.get(httpClientHelper.buildUrl("/user/find-all", map), Object.class);
+                } catch (Exception e) {
+                    Log.e(TAG, "error: ", e);
+                    if (e instanceof GeneralException) {
+                        return ((GeneralException) e).getCode();
+                    }
+                    return "ERROR";
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Object result) {
+                super.onPostExecute(result);
+                if (result instanceof String) {
+                    CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
+                } else {
+                    ListUserResponse listUserResponse = objectMapper.convertValue(result, ListUserResponse.class);
+                    list = listUserResponse.getListUser();
+                    assigneeList = list.stream().map(UserData::getName).collect(Collectors.toList());
+                    setUpAdapter();
+                }
+            }
+        }
+
+        GetListUser getListUser = new GetListUser();
+        getListUser.execute();
+    }
+
+    private void setUpAdapter() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this.context,
+                android.R.layout.simple_dropdown_item_1line,
+                getResources().getStringArray(R.array.priority_dropdown_items));
+        this.autoCompleteTextView.setAdapter(adapter);
+
+        ArrayAdapter<String> userAdapter = new ArrayAdapter<>(this.context,
+                android.R.layout.simple_list_item_multiple_choice,
+                this.assigneeList);
+        this.lvAssignees.setAdapter(userAdapter);
     }
 
     private boolean validateForm() {

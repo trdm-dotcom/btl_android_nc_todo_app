@@ -1,6 +1,6 @@
 package com.example.todo.model.request;
 
-import java.util.List;
+import java.util.Set;
 
 public class TaskRequest {
     private String title;
@@ -9,13 +9,13 @@ public class TaskRequest {
     private String startDate;
     private String endDate;
     private Boolean remind;
-    private List<Long> assignees;
+    private Set<Long> assignees;
     private Long organizationId;
 
     public TaskRequest() {
     }
 
-    public TaskRequest(String title, String description, String priority, String startDate, String endDate, Boolean remind, List<Long> assignees, Long organizationId) {
+    public TaskRequest(String title, String description, String priority, String startDate, String endDate, Boolean remind, Set<Long> assignees, Long organizationId) {
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -74,11 +74,11 @@ public class TaskRequest {
         this.remind = remind;
     }
 
-    public List<Long> getAssignees() {
+    public Set<Long> getAssignees() {
         return assignees;
     }
 
-    public void setAssignees(List<Long> assignees) {
+    public void setAssignees(Set<Long> assignees) {
         this.assignees = assignees;
     }
 

@@ -122,7 +122,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
             @Override
             public void onClick(View view) {
                 TaskFormFragment taskFormFragment = new TaskFormFragment();
-                taskFormFragment.setTaskId(0L, organization, false, new TaskFormFragment.setRefreshListener() {
+                taskFormFragment.setTaskId(null, organization, false, new TaskFormFragment.setRefreshListener() {
                     @Override
                     public void refresh() {
                         getSavedTasks(startDate, endDate);
@@ -146,6 +146,7 @@ public class MainTaskPageFragment extends Fragment implements OrganizationFormFr
             public void onItemClick(TaskDto item) {
                 Bundle bundle = new Bundle();
                 bundle.putLong("task", item.getId());
+                bundle.putLong("organization", organization);
                 navController.navigate(R.id.action_mainTaskPageFragment_to_taskDetailsFragment, bundle);
             }
         });

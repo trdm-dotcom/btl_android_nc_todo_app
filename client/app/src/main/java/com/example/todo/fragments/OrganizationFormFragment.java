@@ -5,10 +5,13 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +20,9 @@ import com.example.todo.R;
 import com.example.todo.common.GeneralException;
 import com.example.todo.custom.CustomToast;
 import com.example.todo.model.dto.OrganizationDto;
+import com.example.todo.model.dto.UserData;
 import com.example.todo.model.request.OrganizationRequest;
+import com.example.todo.model.response.ListUserResponse;
 import com.example.todo.utils.HttpClientHelper;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -28,16 +33,26 @@ import com.fasterxml.jackson.databind.type.LogicalType;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class OrganizationFormFragment extends BottomSheetDialogFragment {
     private TextInputEditText orgNameEdt;
     private ImageView nextBtn;
     private HttpClientHelper httpClientHelper;
     private setRefreshListener setRefreshListener;
     private static final String TAG = SignUpFragment.class.getSimpleName();
-    private long orgId;
+    private Long organization;
     private boolean isEdit;
     private Context context;
     private ObjectMapper objectMapper;
+    private List<UserData> list = new ArrayList<>();
+    private List<String> memberList = new ArrayList<>();
+    private ListView lvMember;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,6 +71,12 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
         View rootView = inflater.inflate(R.layout.fragment_organization_form, container, false);
         this.orgNameEdt = rootView.findViewById(R.id.orgNameEdt);
         this.nextBtn = rootView.findViewById(R.id.nextBtn);
+        this.lvMember = rootView.findViewById(R.id.lvMember);
+        if (isEdit) {
+            this.getOrganization(organization);
+        }
+        this.setUpAdapter();
+        this.getListUser();
         return rootView;
     }
 
@@ -72,8 +93,8 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
         });
     }
 
-    public void setOrgId(long orgId, boolean isEdit, OrganizationFormFragment.setRefreshListener setRefreshListener, Context context) {
-        this.orgId = orgId;
+    public void setOrgId(Long orgId, boolean isEdit, OrganizationFormFragment.setRefreshListener setRefreshListener, Context context) {
+        this.organization = orgId;
         this.isEdit = isEdit;
         this.setRefreshListener = setRefreshListener;
         this.context = context;
@@ -90,8 +111,12 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
             @Override
             protected String doInBackground(Void... voids) {
                 try {
+                    SparseBooleanArray checked = lvMember.getCheckedItemPositions();
                     OrganizationRequest body = new OrganizationRequest();
                     body.setName(orgNameEdt.getText().toString().trim());
+                    body.setMembers(IntStream.range(0, lvMember.getCount())
+                            .filter(i -> checked.get(i))
+                            .mapToObj(i -> list.get(i).getId()).collect(Collectors.toSet()));
                     httpClientHelper.post(
                             httpClientHelper.buildUrl("/organization/create", null),
                             body,
@@ -161,6 +186,50 @@ public class OrganizationFormFragment extends BottomSheetDialogFragment {
 
         GetOrganizationInBackend getOrganizationInBackend = new GetOrganizationInBackend();
         getOrganizationInBackend.execute(id);
+    }
+
+    private void getListUser() {
+        class GetListUser extends AsyncTask<Void, Void, Object> {
+            @Override
+            protected Object doInBackground(Void... voids) {
+                try {
+                    Map<String, Object> map = new HashMap<>();
+                    if (organization != null) {
+                        map.put("organization", organization);
+                    }
+                    return httpClientHelper.get(httpClientHelper.buildUrl("/user/find-all", map), Object.class);
+                } catch (Exception e) {
+                    Log.e(TAG, "error: ", e);
+                    if (e instanceof GeneralException) {
+                        return ((GeneralException) e).getCode();
+                    }
+                    return "ERROR";
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Object result) {
+                super.onPostExecute(result);
+                if (result instanceof String) {
+                    CustomToast.makeText(getActivity(), result.toString(), CustomToast.LENGTH_LONG, CustomToast.ERROR).show();
+                } else {
+                    ListUserResponse listUserResponse = objectMapper.convertValue(result, ListUserResponse.class);
+                    list = listUserResponse.getListUser();
+                    memberList = list.stream().map(UserData::getName).collect(Collectors.toList());
+                    setUpAdapter();
+                }
+            }
+        }
+
+        GetListUser getListUser = new GetListUser();
+        getListUser.execute();
+    }
+
+    private void setUpAdapter() {
+        ArrayAdapter<String> userAdapter = new ArrayAdapter<>(this.context,
+                android.R.layout.simple_list_item_multiple_choice,
+                this.memberList);
+        this.lvMember.setAdapter(userAdapter);
     }
 
     private boolean validateForm() {

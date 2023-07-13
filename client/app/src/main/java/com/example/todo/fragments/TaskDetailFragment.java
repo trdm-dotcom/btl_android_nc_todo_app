@@ -54,7 +54,8 @@ public class TaskDetailFragment extends Fragment {
     private ListView lvComment;
     private EditText edtContentMessage;
     private CommentAdapter commentAdapter;
-    private Long taskId;
+    private Long task;
+    private Long organization;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +66,8 @@ public class TaskDetailFragment extends Fragment {
         this.objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.objectMapper.coercionConfigFor(LogicalType.Enum).setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
-        this.taskId = getArguments().getLong("task");
+        this.task = getArguments().getLong("task");
+        this.organization = getArguments().getLong("organization");
     }
 
     @Nullable
@@ -82,7 +84,7 @@ public class TaskDetailFragment extends Fragment {
         this.edtContentMessage = rootView.findViewById(R.id.edtContentMessage);
         this.imgSend = rootView.findViewById(R.id.imgSend);
         this.setUpAdapter();
-        this.getTaskDetail(this.taskId);
+        this.getTaskDetail(this.task);
         return rootView;
     }
 
@@ -93,8 +95,9 @@ public class TaskDetailFragment extends Fragment {
         this.back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("TAG", "onClick: ");
-                navController.popBackStack();
+                Bundle bundle = new Bundle();
+                bundle.putLong("organization", organization);
+                navController.navigate(R.id.action_taskDetailsFragment_to_mainTaskPageFragment, bundle);
             }
         });
         this.imgSend.setOnClickListener(new View.OnClickListener() {
@@ -126,7 +129,7 @@ public class TaskDetailFragment extends Fragment {
                         }
                     }
                     CreateComment createComment = new CreateComment();
-                    createComment.execute(new CommentRequest(content, taskId));
+                    createComment.execute(new CommentRequest(content, task));
                 }
             }
         });
