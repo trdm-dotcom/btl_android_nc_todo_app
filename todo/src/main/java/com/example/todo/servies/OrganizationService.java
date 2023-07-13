@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -49,8 +50,20 @@ public class OrganizationService {
         Organization organization = new Organization();
         organization.setName(request.getName());
         organization = this.organizationRepository.save(organization);
-        currentUser.getOrganizations().add(organization);
-        this.userRepository.save(currentUser);
+        Set<User> users = new HashSet<User>() {{
+            add(currentUser);
+        }};
+        if (!CollectionUtils.isEmpty(request.getMembers())) {
+            users.addAll(this.userRepository.findByIdIn(request.getMembers()));
+            if(!CollectionUtils.isEmpty(users)) {
+                Organization finalOrganization = organization;
+                users.forEach(user -> {
+                    user.getOrganizations().add(finalOrganization);
+                });
+
+            }
+        }
+        this.userRepository.saveAll(users);
         return new HashMap<>();
     }
 

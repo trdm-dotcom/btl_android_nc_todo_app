@@ -109,6 +109,10 @@ public class TaskService {
         task.setEndDate(request.getEndDate());
         task.setPriority(Priority.valueOf(request.getPriority()));
         task.setRemind(request.getRemind());
+        if (!CollectionUtils.isEmpty(request.getAssignees())) {
+            Set<User> users = this.userRepository.findByIdIn(request.getAssignees());
+            task.getAssignees().addAll(users);
+        }
         this.taskRepository.save(task);
         return new HashMap<>();
     }
