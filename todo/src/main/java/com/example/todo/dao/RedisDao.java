@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.TimeUnit;
 
-@Service
+//@Service
 @Slf4j
 public class RedisDao {
-    @Autowired
+//    @Autowired
     private RedisTemplate<String, String> redisTemplate;
-    @Autowired
+//    @Autowired
     private ObjectMapper objectMapper;
 
     public void addLoginValidate(LoginValidate loginValidate) throws JsonProcessingException {

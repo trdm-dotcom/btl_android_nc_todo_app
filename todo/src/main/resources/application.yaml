@@ -22,10 +22,10 @@ spring:
     default-property-inclusion: non_null
     deserialization:
       read_unknown_enum_values_as_null: true
-  redis:
-    host: localhost
-    port: 6379
-    password:
+#  redis:
+#    host: localhost
+#    port: 6379
+#    password:
 
 logging:
   file: /logs/application.log

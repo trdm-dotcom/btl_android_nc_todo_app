@@ -44,8 +44,8 @@ public class AuthenticationService {
     private TokenService tokenService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private RedisDao redisDao;
+//    @Autowired
+//    private RedisDao redisDao;
 
     public AuthenticationResponse login(LoginRequest request) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, IOException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
         request.validate();
@@ -72,21 +72,21 @@ public class AuthenticationService {
         User user = null;
         try {
             user = this.userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new GeneralException(Constants.INVALID_USER));
-            LoginValidate loginValidate = this.redisDao.findLoginValidate(request.getEmail());
-            if (loginValidate.getFailCount() >= appConfig.getLoginTemporarilyLocked()) {
-                if (loginValidate.getLatestRequest().plusSeconds(appConfig.getLoginTemporarilyLockedTime()).isAfter(now))
-                    throw new GeneralException(Constants.LOGIN_TEMPORARILY_LOCKED);
-                loginValidate.setFailCount(1);
-            }
-            loginValidate.setFailCount(user == null ? loginValidate.getFailCount() + 1 : 0);
-            loginValidate.setLatestRequest(now);
-            this.redisDao.addLoginValidate(loginValidate);
+//            LoginValidate loginValidate = this.redisDao.findLoginValidate(request.getEmail());
+//            if (loginValidate.getFailCount() >= appConfig.getLoginTemporarilyLocked()) {
+//                if (loginValidate.getLatestRequest().plusSeconds(appConfig.getLoginTemporarilyLockedTime()).isAfter(now))
+//                    throw new GeneralException(Constants.LOGIN_TEMPORARILY_LOCKED);
+//                loginValidate.setFailCount(1);
+//            }
+//            loginValidate.setFailCount(user == null ? loginValidate.getFailCount() + 1 : 0);
+//            loginValidate.setLatestRequest(now);
+//            this.redisDao.addLoginValidate(loginValidate);
         } catch (Exception ex) {
             if (!ex.getMessage().equals(Constants.OBJECT_NOT_FOUND)) {
                 throw ex;
             }
             LoginValidate loginValidate = new LoginValidate(request.getEmail(), user == null ? 1 : 0, now);
-            this.redisDao.addLoginValidate(loginValidate);
+//            this.redisDao.addLoginValidate(loginValidate);
         }
         if(user == null) {
             throw new GeneralException(Constants.INVALID_CLIENT_CREDENTIAL);
